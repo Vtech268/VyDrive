@@ -293,7 +293,7 @@ async function cleanExpiredFiles(req, res) {
 }
 
 function getMatchingRedirectUri(req) {
-  const config = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '../config/config.json'), 'utf8'));
+  const config = require('../config');
   const registered = (config.web && config.web.redirect_uris) || [];
   const host = req.headers['x-forwarded-host'] || req.get('host');
   // Find a registered URI that contains the current host

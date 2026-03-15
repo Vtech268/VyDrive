@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { File } = require('../services/mongodb');
 const { uploadFile, deleteFile, getDirectUrl, getPreviewUrl } = require('../services/googleDrive');
-const config = require('../config/config.json');
+const config = require('../config');
 
 /**
  * Upload page

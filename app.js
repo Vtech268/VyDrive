@@ -1,10 +1,11 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const { MongoStore } = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const engine = require('ejs-mate');
-const config = require('./config/config.json');
+const config = require('./config');
 
 // Import routes
 const indexRoutes = require('./routes/index');
@@ -20,7 +21,11 @@ const { initMongoDB } = require('./services/mongodb');
 const { initGoogleSheets } = require('./services/googleSheets');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Trust proxy (penting untuk Vercel agar secure cookie berjalan)
+app.set('trust proxy', 1);
 
 // View engine setup
 app.engine('ejs', engine);
@@ -33,25 +38,41 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(methodOverride('_method'));
 
+// Session store setup - gunakan MongoDB store jika MONGODB_URI tersedia
+function buildSessionStore() {
+  const mongoUri = config.MONGODB_URI || config.MONGODB_URI_FALLBACK;
+  if (mongoUri) {
+    return MongoStore.create({
+      mongoUrl: mongoUri,
+      collectionName: 'sessions',
+      ttl: 24 * 60 * 60,
+      autoRemove: 'native'
+    });
+  }
+  return undefined;
+}
+
+const sessionStore = buildSessionStore();
+
 // Session middleware
 app.use(session({
   secret: config.app.session_secret,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  store: sessionStore,
   cookie: { 
-    secure: false,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    secure: isProduction,
+    httpOnly: true,
+    sameSite: isProduction ? 'lax' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 
 // Static files - PENTING: Express static middleware
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve uploaded files from /tmp/uploads on serverless (Vercel), or public/uploads locally
-const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-if (isServerless) {
-  app.use('/uploads', express.static('/tmp/uploads'));
-}
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // Favicon fallback
 app.get('/favicon.ico', (req, res) => res.redirect(301, '/favicon.svg'));
@@ -59,6 +80,19 @@ app.get('/favicon.png', (req, res) => res.redirect(301, '/favicon.svg'));
 
 // Always serve mock-drive folder (used as fallback storage)
 app.use('/mock-drive', express.static(path.join(__dirname, 'public', 'mock-drive')));
+
+// Auto-reconnect MongoDB di setiap request (penting untuk Vercel cold start)
+const { checkConnection } = require('./services/mongodb');
+app.use(async (req, res, next) => {
+  if (config.MONGODB_URI || config.MONGODB_URI_FALLBACK) {
+    try {
+      await checkConnection();
+    } catch (e) {
+      // Gagal connect, lanjut saja (beberapa fitur mungkin tidak berfungsi)
+    }
+  }
+  next();
+});
 
 // Global middleware untuk set user dan config di locals
 app.use((req, res, next) => {
@@ -68,6 +102,29 @@ app.use((req, res, next) => {
   res.locals.appName = config.app.name;
   res.locals.appVersion = config.app.version;
   next();
+});
+
+// Health check endpoint (untuk test API)
+app.get('/health', async (req, res) => {
+  const mongoUri = config.MONGODB_URI || config.MONGODB_URI_FALLBACK;
+  let mongoStatus = 'not configured';
+  if (mongoUri) {
+    try {
+      const connected = await checkConnection();
+      mongoStatus = connected ? 'connected' : 'disconnected';
+    } catch (e) {
+      mongoStatus = 'error: ' + e.message;
+    }
+  }
+  const { isSheetsAvailable } = require('./services/googleSheets');
+  res.json({
+    status: 'ok',
+    version: config.app.version,
+    mongodb: mongoStatus,
+    googleSheets: isSheetsAvailable() ? 'connected' : 'not connected',
+    session: req.session ? 'active' : 'none',
+    sessionUser: req.session.user ? req.session.user.username : 'not logged in'
+  });
 });
 
 // Routes
@@ -148,17 +205,11 @@ async function initServices() {
   });
 }
 
-// In serverless (Vercel), just initialize services without listening
-// In local/traditional server, listen on port
-if (process.env.VERCEL || process.env.NOW_REGION) {
-  initServices();
-} else {
-  initServices().then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 VyDrive Cloud v${config.app.version} running on port ${PORT}`);
-      console.log(`📁 Static files served from: ${path.join(__dirname, 'public')}`);
-    });
+initServices().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 VyDrive Cloud v${config.app.version} running on port ${PORT}`);
+    console.log(`📁 Static files served from: ${path.join(__dirname, 'public')}`);
   });
-}
+});
 
 module.exports = app;

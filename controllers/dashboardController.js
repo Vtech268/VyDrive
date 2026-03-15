@@ -1,6 +1,6 @@
 const { File, User, VyDB } = require('../services/mongodb');
 const { getSheetData } = require('../services/googleSheets');
-const config = require('../config/config.json');
+const config = require('../config');
 
 function isAdminUser(req) {
   return req.session.user && req.session.user.isAdmin;

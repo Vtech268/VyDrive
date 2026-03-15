@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 function getConfig() {
-  delete require.cache[require.resolve('../config/config.json')];
-  return require('../config/config.json');
+  delete require.cache[require.resolve('../config')];
+  return require('../config');
 }
 
 // Always use /tmp for mock storage — writable in ALL environments (local, Vercel, etc.)
@@ -24,11 +24,12 @@ function getDriveClient() {
   const config = getConfig();
 
   // Prefer OAuth2 user credentials (refresh token) — uses personal Drive quota
-  if (config.DRIVE_REFRESH_TOKEN) {
+  const refreshToken = getStoredRefreshToken();
+  if (refreshToken) {
     try {
       const oauth2Client = getOAuth2Client();
       if (oauth2Client) {
-        oauth2Client.setCredentials({ refresh_token: config.DRIVE_REFRESH_TOKEN });
+        oauth2Client.setCredentials({ refresh_token: refreshToken });
         return google.drive({ version: 'v3', auth: oauth2Client });
       }
     } catch (e) {
@@ -58,9 +59,18 @@ function getDriveClient() {
   return null;
 }
 
-function isOAuthReady() {
+function getStoredRefreshToken() {
   const config = getConfig();
-  return !!config.DRIVE_REFRESH_TOKEN;
+  if (config.DRIVE_REFRESH_TOKEN) return config.DRIVE_REFRESH_TOKEN;
+  const tokenPath = path.join(__dirname, '..', '.drive_token');
+  try {
+    if (fs.existsSync(tokenPath)) return fs.readFileSync(tokenPath, 'utf8').trim();
+  } catch (e) {}
+  return null;
+}
+
+function isOAuthReady() {
+  return !!getStoredRefreshToken();
 }
 
 function getAuthUrl(redirectUri) {
@@ -82,14 +92,13 @@ async function exchangeCodeForToken(code, redirectUri) {
 }
 
 function saveRefreshToken(refreshToken) {
-  const configPath = path.join(__dirname, '..', 'config', 'config.json');
+  // Store token in a local file for persistence across restarts
+  const tokenPath = path.join(__dirname, '..', '.drive_token');
   try {
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    config.DRIVE_REFRESH_TOKEN = refreshToken;
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    fs.writeFileSync(tokenPath, refreshToken, 'utf8');
+    console.log('[DRIVE] Refresh token saved to .drive_token');
   } catch (e) {
-    // On Vercel/read-only filesystems, this will silently skip
-    console.warn('[WARN] saveRefreshToken failed (read-only fs?):', e.message);
+    console.warn('[WARN] saveRefreshToken failed:', e.message);
   }
 }
 

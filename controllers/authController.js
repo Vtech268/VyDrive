@@ -6,6 +6,7 @@ const { checkAdminPassword } = require('../middleware/auth');
  */
 function getLoginPage(req, res) {
   if (req.session.user) {
+    if (req.session.user.isAdmin) return res.redirect('/admin');
     return res.redirect('/dashboard');
   }
   
@@ -35,7 +36,7 @@ function getRegisterPage(req, res) {
 async function login(req, res) {
   try {
     const { username, password } = req.body;
-    const config = require('../config/config.json');
+    const config = require('../config');
     const adminUsername = config.admin_username || 'admin';
 
     // Check if admin login (by username match)
@@ -47,7 +48,11 @@ async function login(req, res) {
           isAdmin: true,
           plan: 'paid'
         };
-        return res.redirect('/admin');
+        // Simpan session dulu sebelum redirect (penting untuk Vercel / serverless)
+        return req.session.save((err) => {
+          if (err) console.error('Session save error:', err);
+          res.redirect('/admin');
+        });
       } else {
         return res.render('pages/login', {
           title: 'Login',
@@ -62,7 +67,7 @@ async function login(req, res) {
     if (!user || user.password !== password) {
       return res.render('pages/login', {
         title: 'Login',
-        error: 'Invalid username or password'
+        error: 'Username atau password salah'
       });
     }
 
@@ -80,12 +85,17 @@ async function login(req, res) {
 
     const returnTo = req.session.returnTo || '/dashboard';
     delete req.session.returnTo;
-    res.redirect(returnTo);
+
+    // Simpan session sebelum redirect
+    req.session.save((err) => {
+      if (err) console.error('Session save error:', err);
+      res.redirect(returnTo);
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.render('pages/login', {
       title: 'Login',
-      error: 'Something went wrong. Please try again.'
+      error: 'Terjadi kesalahan. Silakan coba lagi.'
     });
   }
 }
@@ -98,17 +108,24 @@ async function register(req, res) {
     const { username, email, password, confirmPassword } = req.body;
 
     // Validation
+    if (!username || !email || !password) {
+      return res.render('pages/register', {
+        title: 'Register',
+        error: 'Semua kolom harus diisi'
+      });
+    }
+
     if (password !== confirmPassword) {
       return res.render('pages/register', {
         title: 'Register',
-        error: 'Passwords do not match'
+        error: 'Password tidak cocok'
       });
     }
 
     if (password.length < 6) {
       return res.render('pages/register', {
         title: 'Register',
-        error: 'Password must be at least 6 characters'
+        error: 'Password minimal 6 karakter'
       });
     }
 
@@ -117,7 +134,7 @@ async function register(req, res) {
     if (existingUser) {
       return res.render('pages/register', {
         title: 'Register',
-        error: 'Username or email already exists'
+        error: 'Username atau email sudah digunakan'
       });
     }
 
@@ -144,12 +161,16 @@ async function register(req, res) {
       isAdmin: false
     };
 
-    res.redirect('/dashboard');
+    // Simpan session sebelum redirect
+    req.session.save((err) => {
+      if (err) console.error('Session save error:', err);
+      res.redirect('/dashboard');
+    });
   } catch (error) {
     console.error('Register error:', error);
     res.render('pages/register', {
       title: 'Register',
-      error: 'Something went wrong. Please try again.'
+      error: 'Terjadi kesalahan. Silakan coba lagi.'
     });
   }
 }
@@ -162,6 +183,7 @@ function logout(req, res) {
     if (err) {
       console.error('Logout error:', err);
     }
+    res.clearCookie('connect.sid');
     res.redirect('/');
   });
 }

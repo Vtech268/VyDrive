@@ -55,3 +55,17 @@ All credentials in `config/config.json`:
 - `GOOGLE_SHEET_ID`, `GOOGLE_PROJECT_ID`, `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`
 - `MONGODB_URI`, `MONGODB_URI_FALLBACK`
 - `GOOGLE_DRIVE_FOLDER_ID`, `DRIVE_REFRESH_TOKEN`
+
+## Session & Auth Fixes (March 2026)
+- **connect-mongo** added as session store — session tersimpan di MongoDB, tidak hilang saat Vercel cold start
+- `app.set('trust proxy', 1)` ditambahkan agar `secure` cookie bekerja di Vercel
+- `saveUninitialized: false` → hemat storage, hanya buat session setelah login
+- `req.session.save()` dipanggil eksplisit sebelum `res.redirect()` di login & register — fix logout-on-page-change
+- Login admin redirect ke `/admin`, user biasa ke `/dashboard`
+- `/health` endpoint untuk debug koneksi MongoDB, Sheets, dan session
+
+## Environment Variables Required
+- `MONGODB_URI` — MongoDB Atlas connection string (wajib untuk session & data)
+- `ADMIN_PASSWORD` — Password admin panel
+- `SESSION_SECRET` — Secret untuk enkripsi session cookie
+- `ADMIN_USERNAME` — (opsional, default: `admin`)

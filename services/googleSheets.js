@@ -1,5 +1,5 @@
 const { google } = require('googleapis');
-const config = require('../config/config.json');
+const config = require('../config');
 
 let sheetsAvailable = false;
 let initAttempts = 0;

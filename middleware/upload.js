@@ -1,14 +1,9 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const config = require('../config/config.json');
+const config = require('../config');
 
-// Vercel serverless has a read-only filesystem except /tmp
-// Use /tmp for uploads in production (Vercel), local public/uploads in dev
-const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-const uploadsDir = isServerless
-  ? '/tmp/uploads'
-  : path.join(__dirname, '..', 'public', 'uploads');
+const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });

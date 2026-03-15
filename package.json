@@ -17,6 +17,7 @@
   "author": "VyDrive",
   "license": "MIT",
   "dependencies": {
+    "connect-mongo": "^6.0.0",
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.9",
     "ejs-mate": "^4.0.0",

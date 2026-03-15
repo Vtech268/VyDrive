@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../config/config.json');
+const config = require('../config');
 
 let isConnected = false;
 let useFallback = false;
