@@ -47,6 +47,12 @@ app.use(session({
 // Static files - PENTING: Express static middleware
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve uploaded files from /tmp/uploads on serverless (Vercel), or public/uploads locally
+const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+if (isServerless) {
+  app.use('/uploads', express.static('/tmp/uploads'));
+}
+
 // Favicon fallback
 app.get('/favicon.ico', (req, res) => res.redirect(301, '/favicon.svg'));
 app.get('/favicon.png', (req, res) => res.redirect(301, '/favicon.svg'));
