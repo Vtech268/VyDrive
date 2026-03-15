@@ -47,6 +47,10 @@ app.use(session({
 // Static files - PENTING: Express static middleware
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Favicon fallback
+app.get('/favicon.ico', (req, res) => res.redirect(301, '/favicon.svg'));
+app.get('/favicon.png', (req, res) => res.redirect(301, '/favicon.svg'));
+
 // Always serve mock-drive folder (used as fallback storage)
 app.use('/mock-drive', express.static(path.join(__dirname, 'public', 'mock-drive')));
 
