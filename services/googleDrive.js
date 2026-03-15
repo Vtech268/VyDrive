@@ -7,9 +7,18 @@ function getConfig() {
   return require('../config/config.json');
 }
 
-const MOCK_STORAGE_DIR = path.join(__dirname, '..', 'public', 'mock-drive');
-if (!fs.existsSync(MOCK_STORAGE_DIR)) {
-  fs.mkdirSync(MOCK_STORAGE_DIR, { recursive: true });
+// Vercel filesystem is read-only — use /tmp for temporary storage
+const IS_VERCEL = !!(process.env.VERCEL || process.env.NOW_REGION);
+const MOCK_STORAGE_DIR = IS_VERCEL
+  ? '/tmp/mock-drive'
+  : path.join(__dirname, '..', 'public', 'mock-drive');
+
+try {
+  if (!fs.existsSync(MOCK_STORAGE_DIR)) {
+    fs.mkdirSync(MOCK_STORAGE_DIR, { recursive: true });
+  }
+} catch (e) {
+  console.warn('[WARN] Could not create mock-drive dir:', e.message);
 }
 
 const mockFiles = new Map();
@@ -84,15 +93,28 @@ async function exchangeCodeForToken(code, redirectUri) {
 }
 
 function saveRefreshToken(refreshToken) {
+  if (IS_VERCEL) {
+    // On Vercel, filesystem is read-only — log only, token can't be persisted
+    console.log('[VERCEL] saveRefreshToken: filesystem is read-only, token not persisted.');
+    return;
+  }
   const configPath = path.join(__dirname, '..', 'config', 'config.json');
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  config.DRIVE_REFRESH_TOKEN = refreshToken;
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    config.DRIVE_REFRESH_TOKEN = refreshToken;
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  } catch (e) {
+    console.warn('[WARN] saveRefreshToken failed:', e.message);
+  }
 }
 
 async function storeFileMock(filePath, fileName, mimeType) {
-  if (!fs.existsSync(MOCK_STORAGE_DIR)) {
-    fs.mkdirSync(MOCK_STORAGE_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(MOCK_STORAGE_DIR)) {
+      fs.mkdirSync(MOCK_STORAGE_DIR, { recursive: true });
+    }
+  } catch (e) {
+    console.warn('[WARN] storeFileMock mkdir failed:', e.message);
   }
   const fileId = 'mock_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
   const mockPath = path.join(MOCK_STORAGE_DIR, fileId);
