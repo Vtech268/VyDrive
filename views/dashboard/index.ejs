@@ -1,0 +1,132 @@
+<% layout("/layouts/dashboard") %>
+
+
+<div class="dashboard-header-section">
+  <h1 class="page-title">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+  </h1>
+  <p class="page-subtitle">Selamat datang kembali, <%= user ? user.username : 'User' %>!</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-blue">
+      <i class="fas fa-folder"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= totalFiles || 0 %></h3>
+      <p class="stat-label">Total Files</p>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-green">
+      <i class="fas fa-database"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= vydbList ? vydbList.length : 0 %></h3>
+      <p class="stat-label">VyDB Databases</p>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-purple">
+      <i class="fas fa-hdd"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= user && user.storageUsed ? (user.storageUsed / 1024 / 1024).toFixed(1) : '0' %> MB</h3>
+      <p class="stat-label">Storage Used</p>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-orange">
+      <i class="fas fa-crown"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= user && user.plan ? user.plan.toUpperCase() : 'FREE' %></h3>
+      <p class="stat-label">Current Plan</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Files -->
+<div class="dashboard-section">
+  <div class="section-header">
+    <h2 class="section-title">
+      <i class="fas fa-clock"></i> File Terbaru
+    </h2>
+    <a href="/dashboard/files" class="btn btn-sm btn-outline">
+      Lihat Semua <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+  
+  <% if (files && files.length > 0) { %>
+    <div class="file-grid">
+      <% files.forEach(function(file) { %>
+        <div class="file-card">
+          <div class="file-preview-small">
+            <% if (file.mimeType && file.mimeType.startsWith('image/')) { %>
+              <i class="fas fa-image"></i>
+            <% } else if (file.mimeType && file.mimeType.startsWith('video/')) { %>
+              <i class="fas fa-video"></i>
+            <% } else if (file.mimeType && file.mimeType.startsWith('audio/')) { %>
+              <i class="fas fa-music"></i>
+            <% } else { %>
+              <i class="fas fa-file"></i>
+            <% } %>
+          </div>
+          <div class="file-info-small">
+            <h4 class="file-name-small" title="<%= file.originalName %>"><%= file.originalName %></h4>
+            <p class="file-meta-small">
+              <%= (file.size / 1024).toFixed(1) %> KB • 
+              <%= new Date(file.createdAt).toLocaleDateString() %>
+            </p>
+          </div>
+          <div class="file-actions-small">
+            <a href="/file/<%= file.filename %>" class="btn btn-icon btn-sm" title="View">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a href="/file/<%= file.filename %>/download" class="btn btn-icon btn-sm" title="Download">
+              <i class="fas fa-download"></i>
+            </a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <i class="fas fa-folder-open"></i>
+      <p>Belum ada file</p>
+      <a href="/file/upload" class="btn btn-primary">
+        <i class="fas fa-upload"></i> Upload File
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Quick Actions -->
+<div class="dashboard-section">
+  <h2 class="section-title">
+    <i class="fas fa-bolt"></i> Aksi Cepat
+  </h2>
+  <div class="quick-actions">
+    <a href="/file/upload" class="quick-action">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <span>Upload File</span>
+    </a>
+    <a href="/dashboard/vydb" class="quick-action">
+      <i class="fas fa-database"></i>
+      <span>Buat Database</span>
+    </a>
+    <a href="/api-docs" class="quick-action">
+      <i class="fas fa-book"></i>
+      <span>Dokumentasi API</span>
+    </a>
+    <a href="/chat" class="quick-action">
+      <i class="fas fa-comments"></i>
+      <span>Support Chat</span>
+    </a>
+  </div>
+</div>

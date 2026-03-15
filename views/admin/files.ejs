@@ -1,0 +1,84 @@
+<% layout('/layouts/dashboard') %>
+
+<div class="dashboard-header-section">
+  <h1 class="page-title"><i class="fas fa-folder"></i> Kelola File</h1>
+  <p class="page-subtitle">Semua file yang diupload user</p>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="alert alert-danger"><i class="fas fa-times-circle"></i> <%= error %></div>
+<% } %>
+
+<div class="dashboard-section">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <h2 class="section-title"><i class="fas fa-list"></i> Daftar File (<%= files.length %>)</h2>
+  </div>
+
+  <% if (files && files.length > 0) { %>
+  <div class="table-responsive">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>Nama File</th>
+          <th>User</th>
+          <th>Ukuran</th>
+          <th>Tipe</th>
+          <th>Tanggal</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% files.forEach(function(file) { %>
+        <tr id="file-row-<%= file._id %>">
+          <td>
+            <div class="file-cell">
+              <i class="fas fa-file"></i>
+              <span title="<%= file.originalName %>">
+                <%= file.originalName && file.originalName.length > 35 ? file.originalName.substring(0, 35) + '...' : (file.originalName || file.filename) %>
+              </span>
+            </div>
+          </td>
+          <td><small><%= file.userId %></small></td>
+          <td><%= file.size ? (file.size / 1024).toFixed(1) + ' KB' : '-' %></td>
+          <td><%= file.mimetype ? file.mimetype.split('/')[0] : '-' %></td>
+          <td><%= new Date(file.createdAt).toLocaleDateString('id-ID') %></td>
+          <td>
+            <div style="display:flex;gap:0.25rem;">
+              <a href="/file/<%= file.filename %>" class="btn btn-icon btn-sm" target="_blank" title="Preview">
+                <i class="fas fa-eye"></i>
+              </a>
+              <button class="btn btn-icon btn-sm btn-danger" onclick="adminDeleteFile('<%= file._id %>')" title="Hapus">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <i class="fas fa-folder-open fa-3x" style="color:var(--text-muted);margin-bottom:1rem;"></i>
+    <p class="text-muted">Belum ada file</p>
+  </div>
+  <% } %>
+</div>
+
+<script>
+async function adminDeleteFile(id) {
+  if (!confirm('Yakin ingin menghapus file ini?')) return;
+  try {
+    const res = await fetch('/admin/files/' + id, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('file-row-' + id).remove();
+      showToast('File dihapus', 'success');
+    } else {
+      showToast(data.message || 'Gagal hapus', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+</script>

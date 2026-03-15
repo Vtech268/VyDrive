@@ -1,0 +1,81 @@
+<% layout('/layouts/main') %>
+
+<section class="auth-section">
+  <div class="container">
+    <div class="auth-container">
+      <div class="auth-box">
+        <div class="auth-header">
+          <h1 class="auth-title">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </h1>
+          <p class="auth-desc">
+            Masuk ke akun VyDrive Cloud Anda
+          </p>
+        </div>
+        
+        <% if (error) { %>
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> <%= error %>
+          </div>
+        <% } %>
+        
+        <form action="/auth/login" method="POST" class="auth-form">
+          <div class="form-group">
+            <label class="form-label" for="username">
+              <i class="fas fa-user"></i> Username
+            </label>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              class="form-input" 
+              placeholder="Masukkan username"
+              required
+              autocomplete="username"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="password">
+              <i class="fas fa-lock"></i> Password
+            </label>
+            <div class="input-group">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-input" 
+                placeholder="Masukkan password"
+                required
+                autocomplete="current-password"
+              >
+              <button type="button" class="btn-toggle-password" data-target="password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+        
+        <div class="auth-divider">
+          <span>atau</span>
+        </div>
+        
+        <div class="auth-social">
+          <p class="auth-text">
+            Belum punya akun? 
+            <a href="/auth/register" class="auth-link">Daftar sekarang</a>
+          </p>
+        </div>
+        
+        <div class="auth-note">
+          <i class="fas fa-info-circle"></i>
+          <span>Anda juga bisa menggunakan fitur sebagai guest tanpa login.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

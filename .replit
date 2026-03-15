@@ -1,0 +1,22 @@
+modules = ["nodejs-20"]
+[workflows]
+
+[[workflows.workflow]]
+name = "run"
+mode = "sequential"
+author = 54068353
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm i"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node app.js"
+
+[agent]
+expertMode = true
+
+[[ports]]
+localPort = 3000
+externalPort = 80

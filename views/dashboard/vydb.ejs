@@ -1,0 +1,208 @@
+<% layout("/layouts/dashboard") %>
+
+
+<div class="dashboard-header-section">
+  <h1 class="page-title">
+    <i class="fas fa-database"></i> VyDB - Database API
+  </h1>
+  <p class="page-subtitle">Kelola database API untuk aplikasi Anda</p>
+</div>
+
+<!-- Create Database Card -->
+<div class="dashboard-section">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fas fa-plus-circle"></i> Buat Database Baru</h3>
+    </div>
+    <div class="card-body">
+      <form id="createDbForm" class="form-inline">
+        <div class="form-group form-group-flex">
+          <input 
+            type="text" 
+            id="dbName" 
+            class="form-input" 
+            placeholder="Nama database (min 3 karakter)"
+            required
+            minlength="3"
+            maxlength="30"
+          >
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Buat Database
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Database List -->
+<div class="dashboard-section">
+  <h2 class="section-title">
+    <i class="fas fa-list"></i> Database Anda
+  </h2>
+  
+  <% if (databases && databases.length > 0) { %>
+    <div class="db-grid">
+      <% databases.forEach(function(db) { %>
+        <div class="db-card" data-id="<%= db._id || db.id %>">
+          <div class="db-header">
+            <div class="db-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="db-info">
+              <h4 class="db-name"><%= db.dbName || db.db_name %></h4>
+              <span class="db-date">
+                <%= new Date(db.createdAt || db.created_at).toLocaleDateString() %>
+              </span>
+            </div>
+          </div>
+          
+          <div class="db-api-key">
+            <label>API Key:</label>
+            <div class="api-key-input-group">
+              <input type="password" value="<%= db.apiKey || db.api_key %>" class="api-key-input" readonly>
+              <button type="button" class="btn btn-icon btn-toggle-key">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button type="button" class="btn btn-icon btn-copy-key" data-key="<%= db.apiKey || db.api_key %>">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="db-stats">
+            <div class="db-stat">
+              <i class="fas fa-exchange-alt"></i>
+              <span><%= db.requestCount || db.request_count || 0 %> requests</span>
+            </div>
+          </div>
+          
+          <div class="db-actions">
+            <button type="button" class="btn btn-sm btn-danger btn-delete-db" data-id="<%= db._id || db.id %>">
+              <i class="fas fa-trash"></i> Hapus
+            </button>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <i class="fas fa-database"></i>
+      <p>Belum ada database</p>
+      <p class="empty-hint">Buat database pertama Anda di atas</p>
+    </div>
+  <% } %>
+</div>
+
+<!-- API Documentation Card -->
+<div class="dashboard-section">
+  <div class="card card-info">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fas fa-book"></i> Cara Penggunaan</h3>
+    </div>
+    <div class="card-body">
+      <p>Gunakan API Key pada header <code>X-API-Key</code> untuk setiap request.</p>
+      
+      <h4>Base URL:</h4>
+      <pre class="code-block"><code><%= baseUrl %>/api</code></pre>
+      
+      <h4>Contoh Request (JavaScript):</h4>
+      <pre class="code-block"><code>fetch('<%= baseUrl %>/api/insert', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'your_api_key_here',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    data: { name: 'John', age: 25 }
+  })
+})</code></pre>
+      
+      <a href="/api-docs" class="btn btn-secondary">
+        <i class="fas fa-external-link-alt"></i> Lihat Dokumentasi Lengkap
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('createDbForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const dbName = document.getElementById('dbName').value.trim();
+  if (!dbName) return;
+  
+  try {
+    const response = await fetch('/dashboard/vydb/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dbName })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showToast('Database created successfully!', 'success');
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      showToast(data.message || 'Failed to create database', 'error');
+    }
+  } catch (error) {
+    showToast('Error creating database', 'error');
+  }
+});
+
+// Delete database
+document.querySelectorAll('.btn-delete-db').forEach(btn => {
+  btn.addEventListener('click', async function() {
+    if (!confirm('Yakin ingin menghapus database ini?')) return;
+    
+    const id = this.dataset.id;
+    
+    try {
+      const response = await fetch(`/dashboard/vydb/${id}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showToast('Database deleted successfully!', 'success');
+        this.closest('.db-card').remove();
+      } else {
+        showToast(data.message || 'Failed to delete database', 'error');
+      }
+    } catch (error) {
+      showToast('Error deleting database', 'error');
+    }
+  });
+});
+
+// Toggle API key visibility
+document.querySelectorAll('.btn-toggle-key').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const input = this.previousElementSibling;
+    const icon = this.querySelector('i');
+    
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  });
+});
+
+// Copy API key
+document.querySelectorAll('.btn-copy-key').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const key = this.dataset.key;
+    navigator.clipboard.writeText(key).then(() => {
+      showToast('API Key copied!', 'success');
+    });
+  });
+});
+</script>

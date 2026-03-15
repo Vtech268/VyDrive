@@ -1,0 +1,680 @@
+<% layout('/layouts/main') %>
+
+<div class="docs-page">
+
+  <!-- Mobile Nav Toggle Bar -->
+  <div class="docs-mobile-bar">
+    <div class="container">
+      <button class="docs-mobile-toggle" id="docsMobileToggle" aria-expanded="false">
+        <i class="fas fa-list-ul"></i>
+        <span>Daftar Isi</span>
+        <i class="fas fa-chevron-down docs-toggle-chevron"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="docs-layout">
+
+      <!-- Sidebar -->
+      <aside class="docs-sidebar" id="docsSidebar">
+        <div class="docs-sidebar-inner">
+          <div class="docs-sidebar-header">
+            <span class="docs-sidebar-brand"><i class="fas fa-database"></i> VyDB Docs</span>
+            <span class="docs-version-badge">v2.0</span>
+          </div>
+
+          <nav class="docs-nav" id="docsNav">
+            <div class="docs-nav-group">
+              <span class="docs-nav-label">Mulai</span>
+              <a href="#intro" class="docs-nav-link active" data-section="intro">
+                <i class="fas fa-rocket"></i> Pengenalan
+              </a>
+              <a href="#authentication" class="docs-nav-link" data-section="authentication">
+                <i class="fas fa-key"></i> Autentikasi
+              </a>
+            </div>
+
+            <div class="docs-nav-group">
+              <span class="docs-nav-label">Endpoints</span>
+              <a href="#endpoint-insert" class="docs-nav-link" data-section="endpoint-insert">
+                <span class="nav-method-badge nav-post">POST</span> /insert
+              </a>
+              <a href="#endpoint-get" class="docs-nav-link" data-section="endpoint-get">
+                <span class="nav-method-badge nav-get">GET</span> /get
+              </a>
+              <a href="#endpoint-update" class="docs-nav-link" data-section="endpoint-update">
+                <span class="nav-method-badge nav-patch">PATCH</span> /update
+              </a>
+              <a href="#endpoint-delete" class="docs-nav-link" data-section="endpoint-delete">
+                <span class="nav-method-badge nav-delete">DELETE</span> /delete
+              </a>
+            </div>
+
+            <div class="docs-nav-group">
+              <span class="docs-nav-label">Referensi</span>
+              <a href="#examples" class="docs-nav-link" data-section="examples">
+                <i class="fas fa-code"></i> Contoh Kode
+              </a>
+              <a href="#errors" class="docs-nav-link" data-section="errors">
+                <i class="fas fa-exclamation-triangle"></i> Error Codes
+              </a>
+            </div>
+
+            <div class="docs-nav-group">
+              <span class="docs-nav-label">Tools</span>
+              <a href="#tester" class="docs-nav-link" data-section="tester">
+                <i class="fas fa-flask"></i> API Tester
+              </a>
+            </div>
+          </nav>
+
+          <div class="docs-sidebar-cta">
+            <a href="/dashboard/vydb" class="btn btn-primary btn-block btn-sm">
+              <i class="fas fa-plus"></i> Buat Database
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="docs-content">
+
+        <!-- Page Header -->
+        <div class="docs-page-header">
+          <div class="docs-page-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <div>
+            <h1 class="docs-page-title">VyDB API</h1>
+            <p class="docs-page-subtitle">REST API berbasis Google Spreadsheet untuk menyimpan dan mengelola data JSON.</p>
+          </div>
+        </div>
+
+        <!-- Base URL Banner -->
+        <div class="docs-base-url">
+          <span class="docs-base-url-label">Base URL</span>
+          <div class="docs-base-url-value">
+            <code id="baseUrlCode"><%= baseUrl %>/api</code>
+            <button class="copy-btn" data-copy="<%= baseUrl %>/api" title="Copy Base URL">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== INTRODUCTION ===== -->
+        <section id="intro" class="docs-section">
+          <div class="docs-section-tag">01</div>
+          <h2 class="docs-section-title">Pengenalan</h2>
+          <p class="docs-section-desc">
+            VyDB adalah layanan database API yang menggunakan Google Spreadsheet sebagai penyimpanan data.
+            Anda dapat menyimpan, membaca, memperbarui, dan menghapus data melalui REST API standar
+            dari bahasa pemrograman apa pun.
+          </p>
+
+          <div class="docs-info-grid">
+            <div class="docs-info-card">
+              <div class="docs-info-icon"><i class="fas fa-bolt"></i></div>
+              <h4>Mudah Digunakan</h4>
+              <p>Cukup 4 endpoint untuk operasi CRUD lengkap.</p>
+            </div>
+            <div class="docs-info-card">
+              <div class="docs-info-icon"><i class="fas fa-shield-alt"></i></div>
+              <h4>Aman dengan API Key</h4>
+              <p>Setiap database terisolasi dengan API Key unik.</p>
+            </div>
+            <div class="docs-info-card">
+              <div class="docs-info-icon"><i class="fas fa-code"></i></div>
+              <h4>JSON Native</h4>
+              <p>Request dan response dalam format JSON standar.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== AUTHENTICATION ===== -->
+        <section id="authentication" class="docs-section">
+          <div class="docs-section-tag">02</div>
+          <h2 class="docs-section-title">Autentikasi</h2>
+          <p class="docs-section-desc">
+            Semua request memerlukan API Key yang dikirim melalui header <code class="inline-code">X-API-Key</code>.
+            API Key didapat saat membuat database baru di Dashboard.
+          </p>
+
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-lang"><i class="fas fa-terminal"></i> HTTP Header</span>
+              <button class="copy-btn" data-copy="X-API-Key: your_api_key_here&#10;Content-Type: application/json">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+            <pre class="code-block"><code>X-API-Key: your_api_key_here
+Content-Type: application/json</code></pre>
+          </div>
+
+          <div class="docs-callout docs-callout-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+              <strong>Cara mendapatkan API Key:</strong> Buat database baru di
+              <a href="/dashboard/vydb">Dashboard VyDB</a>, lalu salin API Key yang muncul.
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== ENDPOINTS ===== -->
+        <section id="endpoints" class="docs-section">
+          <div class="docs-section-tag">03</div>
+          <h2 class="docs-section-title">Endpoints</h2>
+          <p class="docs-section-desc">VyDB menyediakan 4 endpoint utama untuk operasi CRUD.</p>
+
+          <!-- Endpoint: INSERT -->
+          <div id="endpoint-insert" class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-post">POST</span>
+                <code class="endpoint-path">/api/insert</code>
+              </div>
+              <p class="endpoint-desc">Menambahkan data baru ke database.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">Request Body</h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"data":{"name":"John Doe","email":"john@example.com","age":25}}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "data": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "age": 25
+  }
+}</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"success":true,"message":"Data inserted successfully"}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "message": "Data inserted successfully",
+  "data": {
+    "id": "1234567890",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "age": 25,
+    "created_at": "2024-01-01T00:00:00.000Z"
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Endpoint: GET -->
+          <div id="endpoint-get" class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-get">GET</span>
+                <code class="endpoint-path">/api/get</code>
+              </div>
+              <p class="endpoint-desc">Mengambil data dari database. Bisa difilter dengan query parameter.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">Query Parameters</h5>
+              <div class="docs-params-table">
+                <div class="params-row params-header">
+                  <span>Parameter</span><span>Tipe</span><span>Keterangan</span>
+                </div>
+                <div class="params-row">
+                  <span><code>key</code></span><span class="param-type">string</span><span>Filter berdasarkan field tertentu (contoh: <code>name=John</code>)</span>
+                </div>
+                <div class="params-row">
+                  <span><code>id</code></span><span class="param-type">string</span><span>Ambil data spesifik berdasarkan ID</span>
+                </div>
+              </div>
+
+              <h5 class="endpoint-sub">Contoh Request</h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-terminal"></i> URL</span>
+                  <button class="copy-btn" data-copy="GET /api/get?name=John&age=25">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>GET /api/get?name=John&age=25
+GET /api/get              ← Ambil semua data
+GET /api/get?id=1234567890  ← Ambil berdasarkan ID</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"success":true,"count":2,"data":[]}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "count": 2,
+  "data": [
+    {
+      "id": "1234567890",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "age": 25
+    }
+  ]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Endpoint: UPDATE -->
+          <div id="endpoint-update" class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-patch">PATCH</span>
+                <code class="endpoint-path">/api/update</code>
+              </div>
+              <p class="endpoint-desc">Memperbarui data yang sudah ada berdasarkan ID.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">Request Body</h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"id":"1234567890","data":{"name":"John Updated","age":26}}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "id": "1234567890",
+  "data": {
+    "name": "John Updated",
+    "age": 26
+  }
+}</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"success":true,"message":"Data updated successfully"}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "message": "Data updated successfully"
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Endpoint: DELETE -->
+          <div id="endpoint-delete" class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-delete">DELETE</span>
+                <code class="endpoint-path">/api/delete</code>
+              </div>
+              <p class="endpoint-desc">Menghapus data dari database berdasarkan ID.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">Request Body</h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"id":"1234567890"}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "id": "1234567890"
+}</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                  <button class="copy-btn" data-copy='{"success":true,"message":"Data deleted successfully"}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "message": "Data deleted successfully"
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== CODE EXAMPLES ===== -->
+        <section id="examples" class="docs-section">
+          <div class="docs-section-tag">04</div>
+          <h2 class="docs-section-title">Contoh Kode</h2>
+          <p class="docs-section-desc">Contoh implementasi menggunakan berbagai bahasa pemrograman.</p>
+
+          <!-- Language Tabs -->
+          <div class="code-tabs">
+            <div class="code-tab-list" role="tablist">
+              <button class="code-tab active" data-tab="js">JavaScript</button>
+              <button class="code-tab" data-tab="nodejs">Node.js</button>
+              <button class="code-tab" data-tab="python">Python</button>
+              <button class="code-tab" data-tab="php">PHP</button>
+              <button class="code-tab" data-tab="curl">cURL</button>
+            </div>
+
+            <!-- JavaScript -->
+            <div class="code-tab-content active" data-content="js">
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fab fa-js-square"></i> JavaScript (Fetch)</span>
+                  <button class="copy-btn copy-tab-content">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>const apiKey = 'your_api_key_here';
+const baseUrl = '<%= baseUrl %>/api';
+
+// Insert data
+const insert = await fetch(`${baseUrl}/insert`, {
+  method: 'POST',
+  headers: {
+    'X-API-Key': apiKey,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    data: { name: 'John Doe', email: 'john@example.com' }
+  })
+});
+console.log(await insert.json());
+
+// Get data
+const get = await fetch(`${baseUrl}/get?name=John`, {
+  headers: { 'X-API-Key': apiKey }
+});
+console.log(await get.json());</code></pre>
+              </div>
+            </div>
+
+            <!-- Node.js -->
+            <div class="code-tab-content" data-content="nodejs">
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fab fa-node-js"></i> Node.js (axios)</span>
+                  <button class="copy-btn copy-tab-content">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>const axios = require('axios');
+
+const api = axios.create({
+  baseURL: '<%= baseUrl %>/api',
+  headers: { 'X-API-Key': 'your_api_key_here' }
+});
+
+// Insert data
+const insert = await api.post('/insert', {
+  data: { name: 'John Doe', email: 'john@example.com' }
+});
+console.log(insert.data);
+
+// Get data
+const get = await api.get('/get', { params: { name: 'John' } });
+console.log(get.data);</code></pre>
+              </div>
+            </div>
+
+            <!-- Python -->
+            <div class="code-tab-content" data-content="python">
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fab fa-python"></i> Python (requests)</span>
+                  <button class="copy-btn copy-tab-content">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>import requests
+
+api_key = 'your_api_key_here'
+base_url = '<%= baseUrl %>/api'
+headers = {'X-API-Key': api_key, 'Content-Type': 'application/json'}
+
+# Insert data
+response = requests.post(f'{base_url}/insert',
+    headers=headers,
+    json={'data': {'name': 'John Doe', 'email': 'john@example.com'}})
+print(response.json())
+
+# Get data
+response = requests.get(f'{base_url}/get',
+    headers=headers,
+    params={'name': 'John'})
+print(response.json())</code></pre>
+              </div>
+            </div>
+
+            <!-- PHP -->
+            <div class="code-tab-content" data-content="php">
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fab fa-php"></i> PHP (cURL)</span>
+                  <button class="copy-btn copy-tab-content">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>&lt;?php
+$apiKey = 'your_api_key_here';
+$baseUrl = '<%= baseUrl %>/api';
+
+function vydb_request($url, $method = 'GET', $data = null, $apiKey = '') {
+    $ch = curl_init($url);
+    $headers = ['X-API-Key: ' . $apiKey, 'Content-Type: application/json'];
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST  => $method,
+        CURLOPT_HTTPHEADER     => $headers,
+        CURLOPT_POSTFIELDS     => $data ? json_encode($data) : null,
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($response, true);
+}
+
+// Insert data
+$result = vydb_request("$baseUrl/insert", 'POST',
+    ['data' => ['name' => 'John Doe', 'email' => 'john@example.com']], $apiKey);
+print_r($result);
+
+// Get data
+$result = vydb_request("$baseUrl/get?name=John", 'GET', null, $apiKey);
+print_r($result);
+?&gt;</code></pre>
+              </div>
+            </div>
+
+            <!-- cURL -->
+            <div class="code-tab-content" data-content="curl">
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-terminal"></i> cURL</span>
+                  <button class="copy-btn copy-tab-content">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code># Insert data
+curl -X POST '<%= baseUrl %>/api/insert' \
+  -H 'X-API-Key: your_api_key_here' \
+  -H 'Content-Type: application/json' \
+  -d '{"data":{"name":"John Doe","email":"john@example.com"}}'
+
+# Get all data
+curl '<%= baseUrl %>/api/get' \
+  -H 'X-API-Key: your_api_key_here'
+
+# Get with filter
+curl '<%= baseUrl %>/api/get?name=John' \
+  -H 'X-API-Key: your_api_key_here'
+
+# Update data
+curl -X PATCH '<%= baseUrl %>/api/update' \
+  -H 'X-API-Key: your_api_key_here' \
+  -H 'Content-Type: application/json' \
+  -d '{"id":"1234567890","data":{"name":"John Updated"}}'
+
+# Delete data
+curl -X DELETE '<%= baseUrl %>/api/delete' \
+  -H 'X-API-Key: your_api_key_here' \
+  -H 'Content-Type: application/json' \
+  -d '{"id":"1234567890"}'</code></pre>
+              </div>
+            </div>
+
+          </div><!-- /.code-tabs -->
+        </section>
+
+        <!-- ===== ERROR HANDLING ===== -->
+        <section id="errors" class="docs-section">
+          <div class="docs-section-tag">05</div>
+          <h2 class="docs-section-title">Error Codes</h2>
+          <p class="docs-section-desc">Semua error dikembalikan dalam format JSON dengan status HTTP yang sesuai.</p>
+
+          <div class="error-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Kode</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="status-badge status-200">200</span></td>
+                  <td><code>OK</code></td>
+                  <td>Request berhasil</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-400">400</span></td>
+                  <td><code>Bad Request</code></td>
+                  <td>Data tidak valid atau format salah</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-401">401</span></td>
+                  <td><code>Unauthorized</code></td>
+                  <td>API Key tidak valid atau tidak disertakan</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-404">404</span></td>
+                  <td><code>Not Found</code></td>
+                  <td>Data atau resource tidak ditemukan</td>
+                </tr>
+                <tr>
+                  <td><span class="status-badge status-500">500</span></td>
+                  <td><code>Server Error</code></td>
+                  <td>Terjadi kesalahan di server</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="docs-callout docs-callout-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <strong>Format error response:</strong>
+              <code class="inline-code">{"success": false, "message": "Error description here"}</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== API TESTER ===== -->
+        <section id="tester" class="docs-section">
+          <div class="docs-section-tag">06</div>
+          <h2 class="docs-section-title">API Tester</h2>
+          <p class="docs-section-desc">Coba endpoint VyDB langsung dari browser. Masukkan API Key dan request body, lalu klik Send.</p>
+
+          <div class="api-tester">
+            <div class="api-tester-form">
+
+              <!-- Method + Endpoint -->
+              <div class="tester-row">
+                <div class="tester-field tester-field-sm">
+                  <label class="tester-label">Method</label>
+                  <select class="tester-select" id="testerMethod">
+                    <option value="POST">/insert</option>
+                    <option value="GET">/get</option>
+                    <option value="PATCH">/update</option>
+                    <option value="DELETE">/delete</option>
+                  </select>
+                </div>
+                <div class="tester-field tester-field-grow">
+                  <label class="tester-label">Base URL</label>
+                  <input type="text" class="tester-input tester-input-readonly" value="<%= baseUrl %>/api" readonly>
+                </div>
+              </div>
+
+              <!-- API Key -->
+              <div class="tester-field">
+                <label class="tester-label">
+                  <i class="fas fa-key"></i> API Key
+                  <span class="tester-label-note">— dari Dashboard VyDB</span>
+                </label>
+                <input type="text" class="tester-input" id="testerApiKey" placeholder="Masukkan API Key Anda di sini...">
+              </div>
+
+              <!-- Request Body -->
+              <div class="tester-field" id="testerBodyField">
+                <div class="tester-label-row">
+                  <label class="tester-label"><i class="fas fa-code"></i> Request Body (JSON)</label>
+                  <button class="tester-format-btn" id="testerFormatBtn" type="button">
+                    <i class="fas fa-magic"></i> Format
+                  </button>
+                </div>
+                <textarea class="tester-textarea" id="testerBody" rows="6" spellcheck="false" placeholder='{"data": {"name": "John", "email": "john@example.com"}}'></textarea>
+              </div>
+
+              <!-- Send Button -->
+              <button class="btn btn-primary" id="testerSendBtn">
+                <i class="fas fa-paper-plane"></i> Send Request
+              </button>
+            </div>
+
+            <!-- Response Panel -->
+            <div class="api-tester-response" id="testerResponse" style="display:none">
+              <div class="tester-response-header">
+                <span class="tester-response-title"><i class="fas fa-terminal"></i> Response</span>
+                <div class="tester-response-meta">
+                  <span class="tester-status-label" id="testerStatusLabel"></span>
+                  <span class="tester-time-label" id="testerTimeLabel"></span>
+                  <button class="copy-btn copy-btn-sm" id="testerCopyBtn">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+              </div>
+              <pre class="tester-response-body" id="testerResponseBody"></pre>
+            </div>
+
+          </div>
+        </section>
+
+      </main><!-- /.docs-content -->
+    </div><!-- /.docs-layout -->
+  </div><!-- /.container -->
+</div><!-- /.docs-page -->
+
+<script src="/js/docs.js"></script>

@@ -1,0 +1,122 @@
+<% layout('/layouts/main') %>
+
+<section class="pricing-section">
+  <div class="container">
+    <div class="pricing-header">
+      <h1 class="pricing-title">Pilihan Plan</h1>
+      <p class="pricing-desc">
+        Pilih plan yang sesuai dengan kebutuhan Anda. 
+        Upgrade kapan saja untuk fitur lebih.
+      </p>
+    </div>
+    
+    <div class="pricing-grid">
+      <!-- Free Plan -->
+      <div class="pricing-card">
+        <div class="pricing-card-header">
+          <h3 class="plan-name">Free</h3>
+          <div class="plan-price">
+            <span class="price">Gratis</span>
+            <span class="period">/selamanya</span>
+          </div>
+        </div>
+        <div class="pricing-card-body">
+          <ul class="plan-features">
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Max file size: <%= plans && plans.free ? (plans.free.max_file_size / 1024 / 1024).toFixed(0) : '100' %> MB</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Max storage: <%= plans && plans.free ? (plans.free.max_storage / 1024 / 1024 / 1024).toFixed(1) : '1' %> GB</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span><%= plans && plans.free ? plans.free.max_files_per_day : '10' %> files/hari</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Semua jenis file</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>VyDB API Access</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Link langsung</span>
+            </li>
+            <li class="feature-disabled">
+              <i class="fas fa-times"></i>
+              <span>Expired permanen</span>
+            </li>
+          </ul>
+        </div>
+        <div class="pricing-card-footer">
+          <a href="/auth/register" class="btn btn-outline btn-block">
+            Daftar Gratis
+          </a>
+        </div>
+      </div>
+      
+      <!-- Paid Plan -->
+      <div class="pricing-card pricing-card-featured">
+        <div class="pricing-badge">POPULAR</div>
+        <div class="pricing-card-header">
+          <h3 class="plan-name">Pro</h3>
+          <div class="plan-price">
+            <span class="price">Rp 50rb</span>
+            <span class="period">/bulan</span>
+          </div>
+        </div>
+        <div class="pricing-card-body">
+          <ul class="plan-features">
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Max file size: <%= plans && plans.paid ? (plans.paid.max_file_size / 1024 / 1024 / 1024).toFixed(1) : '1' %> GB</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Max storage: <%= plans && plans.paid ? (plans.paid.max_storage / 1024 / 1024 / 1024).toFixed(1) : '10' %> GB</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span><%= plans && plans.paid ? plans.paid.max_files_per_day : '100' %> files/hari</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Semua jenis file</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>VyDB API Access</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Link langsung</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Expired permanen</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span>Priority support</span>
+            </li>
+          </ul>
+        </div>
+        <div class="pricing-card-footer">
+          <a href="/auth/register" class="btn btn-primary btn-block">
+            Upgrade ke Pro
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="pricing-note">
+      <i class="fas fa-info-circle"></i>
+      <p>Semua plan mendapat akses ke fitur dasar VyDrive dan VyDB. 
+         Untuk upgrade, silakan hubungi admin melalui <a href="/chat">Live Chat</a>.</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,157 @@
+<% layout("/layouts/dashboard") %>
+
+
+<div class="dashboard-header-section">
+  <h1 class="page-title">
+    <i class="fas fa-user"></i> Profile
+  </h1>
+  <p class="page-subtitle">Kelola informasi akun Anda</p>
+</div>
+
+<div class="profile-grid">
+  <!-- Profile Info -->
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <div class="profile-info">
+        <h3 class="profile-name"><%= user ? user.username : 'User' %></h3>
+        <span class="profile-plan <%= user && user.plan === 'paid' ? 'plan-paid' : 'plan-free' %>">
+          <%= user && user.plan === 'paid' ? 'PRO' : 'FREE' %>
+        </span>
+      </div>
+    </div>
+    
+    <form id="profileForm" class="profile-form">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-input" value="<%= user ? user.username : '' %>" disabled>
+        <small class="form-hint">Username tidak dapat diubah</small>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" 
+               value="<%= user ? user.email : '' %>" required>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Simpan Perubahan
+      </button>
+    </form>
+  </div>
+  
+  <!-- API Key -->
+  <div class="profile-card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fas fa-key"></i> API Key</h3>
+    </div>
+    <div class="card-body">
+      <p class="card-text">Gunakan API Key ini untuk mengakses VyDB API dari aplikasi Anda.</p>
+      
+      <div class="api-key-display">
+        <input type="password" id="apiKey" class="form-input" 
+               value="<%= apiKey || 'Not available' %>" readonly>
+        <button type="button" class="btn btn-icon" id="toggleApiKey">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button type="button" class="btn btn-secondary" id="copyApiKey">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+      
+      <div class="api-info">
+        <p><i class="fas fa-info-circle"></i> Jangan bagikan API Key ke siapapun</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Plan Info -->
+  <div class="profile-card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fas fa-crown"></i> Plan Anda</h3>
+    </div>
+    <div class="card-body">
+      <div class="plan-info">
+        <div class="plan-current">
+          <span class="plan-label">Current Plan:</span>
+          <span class="plan-value <%= user && user.plan === 'paid' ? 'text-success' : 'text-warning' %>">
+            <%= user && user.plan === 'paid' ? 'PRO' : 'FREE' %>
+          </span>
+        </div>
+        
+        <% if (user && user.plan === 'free') { %>
+          <div class="plan-upgrade">
+            <p>Upgrade ke PRO untuk fitur lebih:</p>
+            <ul class="plan-features-list">
+              <li><i class="fas fa-check"></i> File size up to 1GB</li>
+              <li><i class="fas fa-check"></i> 10GB storage</li>
+              <li><i class="fas fa-check"></i> Permanent file expiry</li>
+              <li><i class="fas fa-check"></i> Priority support</li>
+            </ul>
+            <a href="/pricing" class="btn btn-primary btn-block">
+              <i class="fas fa-arrow-up"></i> Upgrade ke PRO
+            </a>
+          </div>
+        <% } else { %>
+          <div class="plan-pro">
+            <p class="text-success"><i class="fas fa-check-circle"></i> Anda menggunakan plan PRO</p>
+            <p>Semua fitur premium telah aktif.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Toggle API key
+document.getElementById('toggleApiKey').addEventListener('click', function() {
+  const input = document.getElementById('apiKey');
+  const icon = this.querySelector('i');
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+});
+
+// Copy API key
+document.getElementById('copyApiKey').addEventListener('click', function() {
+  const input = document.getElementById('apiKey');
+  navigator.clipboard.writeText(input.value).then(() => {
+    showToast('API Key copied!', 'success');
+  });
+});
+
+// Update profile
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  
+  try {
+    const response = await fetch('/dashboard/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showToast('Profile updated successfully!', 'success');
+    } else {
+      showToast(data.message || 'Failed to update profile', 'error');
+    }
+  } catch (error) {
+    showToast('Error updating profile', 'error');
+  }
+});
+</script>

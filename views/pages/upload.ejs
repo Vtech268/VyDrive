@@ -1,0 +1,157 @@
+<% layout('/layouts/main') %>
+
+<section class="upload-section">
+  <div class="container">
+    <div class="upload-container">
+      <div class="upload-header">
+        <h1 class="upload-title">
+          <i class="fas fa-cloud-upload-alt"></i> Upload File
+        </h1>
+        <p class="upload-desc">
+          Upload file Anda ke cloud storage gratis. 
+          File akan disimpan di Google Drive.
+        </p>
+      </div>
+      
+      <!-- Upload Form -->
+      <form id="uploadForm" class="upload-form">
+        <!-- File Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-content">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p class="drop-zone-text">
+              <strong>Drag & drop</strong> file di sini<br>
+              atau <span class="text-primary">klik untuk memilih</span>
+            </p>
+            <p class="drop-zone-hint">
+              Max file size: <%= typeof plans !== 'undefined' && plans && plans.paid ? (plans.paid.max_file_size / 1024 / 1024 / 1024).toFixed(1) : '1' %> GB
+            </p>
+          </div>
+          <input type="file" id="fileInput" name="file" class="file-input" required>
+        </div>
+        
+        <!-- Selected File Info -->
+        <div class="file-info" id="fileInfo" style="display: none;">
+          <div class="file-preview">
+            <i class="fas fa-file"></i>
+          </div>
+          <div class="file-details">
+            <p class="file-name" id="fileName"></p>
+            <p class="file-size" id="fileSize"></p>
+          </div>
+          <button type="button" class="file-remove" id="removeFile">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <!-- Expiry Options -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-clock"></i> Expired File
+          </label>
+          <div class="expiry-options">
+            <label class="expiry-option">
+              <input type="radio" name="expiresIn" value="1" class="expiry-input">
+              <span class="expiry-label">1 Hari</span>
+            </label>
+            <label class="expiry-option">
+              <input type="radio" name="expiresIn" value="7" class="expiry-input" checked>
+              <span class="expiry-label">7 Hari</span>
+            </label>
+            <label class="expiry-option">
+              <input type="radio" name="expiresIn" value="30" class="expiry-input">
+              <span class="expiry-label">30 Hari</span>
+            </label>
+            <label class="expiry-option">
+              <input type="radio" name="expiresIn" value="0" class="expiry-input">
+              <span class="expiry-label">Permanen</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="uploadBtn" disabled>
+          <i class="fas fa-upload"></i> Upload File
+        </button>
+      </form>
+      
+      <!-- Upload Progress -->
+      <div class="upload-progress" id="uploadProgress" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">Uploading... 0%</p>
+      </div>
+      
+      <!-- Upload Result -->
+      <div class="upload-result" id="uploadResult" style="display: none;">
+        <div class="result-icon success">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3 class="result-title">Upload Berhasil!</h3>
+        
+        <div class="result-links">
+          <div class="link-group">
+            <label class="link-label">Direct Link:</label>
+            <div class="link-input-group">
+              <input type="text" id="directLink" class="link-input" readonly>
+              <button type="button" class="btn btn-sm btn-copy" data-target="directLink">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="link-group">
+            <label class="link-label">View Link:</label>
+            <div class="link-input-group">
+              <input type="text" id="viewLink" class="link-input" readonly>
+              <button type="button" class="btn btn-sm btn-copy" data-target="viewLink">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="link-group">
+            <label class="link-label">Download Link:</label>
+            <div class="link-input-group">
+              <input type="text" id="downloadLink" class="link-input" readonly>
+              <button type="button" class="btn btn-sm btn-copy" data-target="downloadLink">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="result-actions">
+          <a href="#" id="previewBtn" class="btn btn-secondary" target="_blank">
+            <i class="fas fa-eye"></i> Preview
+          </a>
+          <a href="#" id="downloadBtn" class="btn btn-primary">
+            <i class="fas fa-download"></i> Download
+          </a>
+          <button type="button" class="btn btn-outline" id="uploadAnother">
+            <i class="fas fa-redo"></i> Upload Lagi
+          </button>
+        </div>
+      </div>
+      
+      <!-- Features -->
+      <div class="upload-features">
+        <div class="feature-item">
+          <i class="fas fa-bolt"></i>
+          <span>Cepat & Stabil</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>Aman & Terjamin</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-link"></i>
+          <span>Link Langsung</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/upload.js"></script>

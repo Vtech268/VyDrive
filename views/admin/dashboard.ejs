@@ -1,0 +1,230 @@
+<% layout('/layouts/dashboard') %>
+
+<div class="dashboard-header-section">
+  <h1 class="page-title">
+    <i class="fas fa-cog"></i> Admin Dashboard
+  </h1>
+  <p class="page-subtitle">Panel administrasi VyDrive Cloud</p>
+</div>
+
+<!-- Admin Stats -->
+<div class="stats-grid stats-grid-4">
+  <div class="stat-card stat-card-admin">
+    <div class="stat-icon stat-icon-blue">
+      <i class="fas fa-folder"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= stats.totalFiles || 0 %></h3>
+      <p class="stat-label">Total Files</p>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card-admin">
+    <div class="stat-icon stat-icon-green">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= stats.totalUsers || 0 %></h3>
+      <p class="stat-label">Total Users</p>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card-admin">
+    <div class="stat-icon stat-icon-purple">
+      <i class="fas fa-database"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= stats.totalDatabases || 0 %></h3>
+      <p class="stat-label">Databases</p>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card-admin">
+    <div class="stat-icon stat-icon-orange">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="stat-info">
+      <h3 class="stat-value"><%= stats.totalChats || 0 %></h3>
+      <p class="stat-label">Chat Messages</p>
+    </div>
+  </div>
+</div>
+
+<!-- Google Drive Status -->
+<% if (typeof driveConnected !== 'undefined') { %>
+<div class="alert <%= driveConnected ? 'alert-success' : 'alert-warning' %>" style="margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+  <div>
+    <i class="fas fa-<%= driveConnected ? 'check-circle' : 'exclamation-triangle' %>"></i>
+    <% if (driveConnected) { %>
+      <strong>Google Drive Terhubung</strong> — File upload langsung ke Drive kamu.
+    <% } else { %>
+      <strong>Google Drive Belum Terhubung</strong> — File disimpan sementara di server lokal.
+    <% } %>
+  </div>
+  <% if (!driveConnected) { %>
+    <a href="/admin/setup-drive" class="btn btn-primary btn-sm">
+      <i class="fab fa-google-drive"></i> Hubungkan Google Drive
+    </a>
+  <% } else { %>
+    <a href="/admin/setup-drive" class="btn btn-outline btn-sm">
+      <i class="fas fa-sync"></i> Reconnect
+    </a>
+  <% } %>
+</div>
+<% } %>
+
+<% if (typeof driveError !== 'undefined' && driveError) { %>
+<div class="alert alert-danger" style="margin-bottom:1.5rem;">
+  <i class="fas fa-times-circle"></i> <strong>Gagal menghubungkan Drive:</strong> <%= driveError %>
+</div>
+<% } %>
+
+<!-- Quick Links -->
+<div class="dashboard-section">
+  <h2 class="section-title">
+    <i class="fas fa-bolt"></i> Menu Admin
+  </h2>
+  <div class="admin-menu">
+    <a href="/admin/files" class="admin-menu-item">
+      <i class="fas fa-folder"></i>
+      <span>Kelola File</span>
+    </a>
+    <a href="/admin/users" class="admin-menu-item">
+      <i class="fas fa-users"></i>
+      <span>Kelola Users</span>
+    </a>
+    <a href="/admin/vydb" class="admin-menu-item">
+      <i class="fas fa-database"></i>
+      <span>Kelola VyDB</span>
+    </a>
+    <a href="/admin/chats" class="admin-menu-item">
+      <i class="fas fa-comments"></i>
+      <span>Kelola Chat</span>
+    </a>
+    <a href="/admin/logs" class="admin-menu-item">
+      <i class="fas fa-list-alt"></i>
+      <span>API Logs</span>
+    </a>
+    <button type="button" class="admin-menu-item" id="cleanExpiredBtn">
+      <i class="fas fa-broom"></i>
+      <span>Clean Expired</span>
+    </button>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="dashboard-section">
+  <h2 class="section-title">
+    <i class="fas fa-clock"></i> Aktivitas Terbaru
+  </h2>
+  
+  <div class="admin-tabs">
+    <button class="tab-btn active" data-tab="recentFiles">Files</button>
+    <button class="tab-btn" data-tab="recentUsers">Users</button>
+  </div>
+  
+  <div class="tab-content active" id="recentFiles">
+    <% if (recentFiles && recentFiles.length > 0) { %>
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>User</th>
+            <th>Size</th>
+            <th>Uploaded</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentFiles.forEach(function(file) { %>
+            <tr>
+              <td>
+                <div class="file-cell">
+                  <i class="fas fa-file"></i>
+                  <span title="<%= file.originalName %>">
+                    <%= file.originalName.length > 30 ? file.originalName.substring(0, 30) + '...' : file.originalName %>
+                  </span>
+                </div>
+              </td>
+              <td><%= file.userId %></td>
+              <td><%= (file.size / 1024).toFixed(1) %> KB</td>
+              <td><%= new Date(file.createdAt).toLocaleDateString() %></td>
+              <td>
+                <a href="/file/<%= file.filename %>" class="btn btn-icon btn-sm" target="_blank">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="text-muted">Belum ada aktivitas</p>
+    <% } %>
+  </div>
+  
+  <div class="tab-content" id="recentUsers">
+    <% if (recentUsers && recentUsers.length > 0) { %>
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Plan</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentUsers.forEach(function(user) { %>
+            <tr>
+              <td><i class="fas fa-user"></i> <%= user.username %></td>
+              <td><%= user.email %></td>
+              <td>
+                <span class="badge <%= user.plan === 'paid' ? 'badge-success' : 'badge-default' %>">
+                  <%= user.plan.toUpperCase() %>
+                </span>
+              </td>
+              <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="text-muted">Belum ada user</p>
+    <% } %>
+  </div>
+</div>
+
+<script>
+// Clean expired files
+document.getElementById('cleanExpiredBtn').addEventListener('click', async function() {
+  if (!confirm('Yakin ingin membersihkan file yang sudah expired?')) return;
+  
+  try {
+    const response = await fetch('/admin/clean-expired', {
+      method: 'POST'
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showToast(`Cleaned ${data.deletedCount} expired files`, 'success');
+    } else {
+      showToast(data.message || 'Failed to clean', 'error');
+    }
+  } catch (error) {
+    showToast('Error cleaning files', 'error');
+  }
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    this.classList.add('active');
+    document.getElementById(this.dataset.tab).classList.add('active');
+  });
+});
+</script>

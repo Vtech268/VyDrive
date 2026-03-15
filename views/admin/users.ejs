@@ -1,0 +1,99 @@
+<% layout('/layouts/dashboard') %>
+
+<div class="dashboard-header-section">
+  <h1 class="page-title"><i class="fas fa-users"></i> Kelola Users</h1>
+  <p class="page-subtitle">Semua user terdaftar</p>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="alert alert-danger"><i class="fas fa-times-circle"></i> <%= error %></div>
+<% } %>
+
+<div class="dashboard-section">
+  <h2 class="section-title"><i class="fas fa-list"></i> Daftar Users (<%= users.length %>)</h2>
+
+  <% if (users && users.length > 0) { %>
+  <div class="table-responsive">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Plan</th>
+          <th>API Key</th>
+          <th>Bergabung</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function(u) { %>
+        <tr id="user-row-<%= u._id %>">
+          <td><i class="fas fa-user"></i> <%= u.username %></td>
+          <td><small><%= u.email || '-' %></small></td>
+          <td>
+            <select class="plan-select" data-id="<%= u._id %>" onchange="updatePlan(this)">
+              <option value="free" <%= u.plan === 'free' ? 'selected' : '' %>>FREE</option>
+              <option value="paid" <%= u.plan === 'paid' ? 'selected' : '' %>>PAID</option>
+            </select>
+          </td>
+          <td><small><code><%= u.apiKey ? u.apiKey.substring(0, 16) + '...' : '-' %></code></small></td>
+          <td><%= new Date(u.createdAt).toLocaleDateString('id-ID') %></td>
+          <td>
+            <button class="btn btn-icon btn-sm btn-danger" onclick="deleteUser('<%= u._id %>')" title="Hapus">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <i class="fas fa-users fa-3x" style="color:var(--text-muted);margin-bottom:1rem;"></i>
+    <p class="text-muted">Belum ada user</p>
+  </div>
+  <% } %>
+</div>
+
+<style>
+.plan-select { padding:0.25rem 0.5rem; border-radius:4px; border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); font-size:0.8rem; cursor:pointer; }
+</style>
+
+<script>
+async function updatePlan(sel) {
+  const id = sel.dataset.id;
+  const plan = sel.value;
+  try {
+    const res = await fetch('/admin/users/' + id + '/plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Plan diupdate ke ' + plan.toUpperCase(), 'success');
+    } else {
+      showToast(data.message || 'Gagal update', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function deleteUser(id) {
+  if (!confirm('Yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan.')) return;
+  try {
+    const res = await fetch('/admin/users/' + id, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('user-row-' + id).remove();
+      showToast('User dihapus', 'success');
+    } else {
+      showToast(data.message || 'Gagal hapus', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+</script>

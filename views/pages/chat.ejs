@@ -1,0 +1,89 @@
+<% layout('/layouts/main') %>
+
+<section class="chat-section">
+  <div class="container">
+    <div class="chat-container">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="chat-avatar">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="chat-header-text">
+            <h2 class="chat-title">Live Chat Support</h2>
+            <p class="chat-status">
+              <span class="status-dot online"></span> Online
+            </p>
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <button type="button" class="btn btn-sm btn-icon" id="refreshChat" title="Refresh">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Chat Messages -->
+      <div class="chat-messages" id="chatMessages">
+        <% if (messages && messages.length > 0) { %>
+          <% messages.forEach(function(msg) { %>
+            <div class="message <%= msg.senderType === 'admin' || msg.sender_type === 'admin' ? 'message-admin' : 'message-user' %>" data-id="<%= msg._id || msg.id %>">
+              <div class="message-avatar">
+                <% if (msg.senderType === 'admin' || msg.sender_type === 'admin') { %>
+                  <i class="fas fa-user-shield"></i>
+                <% } else { %>
+                  <i class="fas fa-user"></i>
+                <% } %>
+              </div>
+              <div class="message-content">
+                <div class="message-header">
+                  <span class="message-sender"><%= msg.sender %></span>
+                  <span class="message-time">
+                    <%= new Date(msg.createdAt || msg.created_at).toLocaleTimeString() %>
+                  </span>
+                </div>
+                <div class="message-text"><%= msg.message %></div>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="chat-empty">
+            <i class="fas fa-comments"></i>
+            <p>Belum ada pesan</p>
+            <p class="chat-empty-hint">Mulai chat dengan tim support kami</p>
+          </div>
+        <% } %>
+      </div>
+      
+      <!-- Chat Input -->
+      <div class="chat-input-container">
+        <form id="chatForm" class="chat-form">
+          <div class="chat-input-group">
+            <input 
+              type="text" 
+              id="messageInput" 
+              class="chat-input" 
+              placeholder="Ketik pesan Anda..."
+              autocomplete="off"
+              maxlength="500"
+            >
+            <button type="submit" class="chat-send-btn" id="sendBtn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </form>
+        <p class="chat-hint">
+          <i class="fas fa-info-circle"></i> 
+          Pesan akan dibalas oleh admin secepatnya
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Chat configuration
+const isAdmin = <%= JSON.stringify(isAdmin || false) %>;
+const userId = <%= JSON.stringify(userId || 'guest') %>;
+</script>
+<script src="/js/chat.js"></script>

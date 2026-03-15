@@ -1,0 +1,70 @@
+<% layout('/layouts/dashboard') %>
+
+<div class="dashboard-header-section">
+  <h1 class="page-title"><i class="fas fa-database"></i> Kelola VyDB</h1>
+  <p class="page-subtitle">Semua database API user</p>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="alert alert-danger"><i class="fas fa-times-circle"></i> <%= error %></div>
+<% } %>
+
+<div class="dashboard-section">
+  <h2 class="section-title"><i class="fas fa-list"></i> Daftar Database (<%= databases.length %>)</h2>
+
+  <% if (databases && databases.length > 0) { %>
+  <div class="table-responsive">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>Nama DB</th>
+          <th>User ID</th>
+          <th>API Key</th>
+          <th>Requests</th>
+          <th>Dibuat</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% databases.forEach(function(db) { %>
+        <tr id="db-row-<%= db._id %>">
+          <td><i class="fas fa-database"></i> <strong><%= db.dbName %></strong></td>
+          <td><small><%= db.userId %></small></td>
+          <td><small><code><%= db.apiKey ? db.apiKey.substring(0, 20) + '...' : '-' %></code></small></td>
+          <td><span class="badge badge-default"><%= db.requestCount || 0 %></span></td>
+          <td><%= new Date(db.createdAt).toLocaleDateString('id-ID') %></td>
+          <td>
+            <button class="btn btn-icon btn-sm btn-danger" onclick="deleteDB('<%= db._id %>')" title="Hapus">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <i class="fas fa-database fa-3x" style="color:var(--text-muted);margin-bottom:1rem;"></i>
+    <p class="text-muted">Belum ada database</p>
+  </div>
+  <% } %>
+</div>
+
+<script>
+async function deleteDB(id) {
+  if (!confirm('Yakin ingin menghapus database ini?')) return;
+  try {
+    const res = await fetch('/admin/vydb/' + id, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('db-row-' + id).remove();
+      showToast('Database dihapus', 'success');
+    } else {
+      showToast(data.message || 'Gagal hapus', 'error');
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+</script>

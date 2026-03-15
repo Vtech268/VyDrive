@@ -1,0 +1,476 @@
+/* ============================================
+   Upload Page Styles
+   ============================================ */
+
+.upload-section {
+  padding: 2rem 0;
+}
+
+.upload-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.upload-header {
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.upload-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 0.5rem;
+}
+
+.upload-title i {
+  color: var(--primary);
+}
+
+.upload-desc {
+  color: var(--gray-600);
+}
+
+.upload-form {
+  padding: 2rem;
+}
+
+/* Drop Zone */
+.drop-zone {
+  border: 3px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--primary);
+  background: rgba(79, 70, 229, 0.05);
+}
+
+.drop-zone-content i {
+  font-size: 4rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.drop-zone-text {
+  font-size: 1.125rem;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.drop-zone-text .text-primary {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.drop-zone-hint {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* File Info */
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.file-preview {
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.file-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 600;
+  color: var(--gray-800);
+  word-break: break-all;
+  font-size: 0.9375rem;
+}
+
+.file-size {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.file-remove {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--danger);
+  color: var(--white);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-remove:hover {
+  background: #dc2626;
+}
+
+/* Expiry Options */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: var(--gray-700);
+}
+
+.expiry-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.expiry-option {
+  position: relative;
+}
+
+.expiry-input {
+  position: absolute;
+  opacity: 0;
+}
+
+.expiry-label {
+  display: block;
+  padding: 0.875rem;
+  text-align: center;
+  background: var(--gray-50);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.expiry-input:checked + .expiry-label {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+}
+
+.expiry-label:hover {
+  border-color: var(--primary);
+}
+
+/* Upload Progress */
+.upload-progress {
+  padding: 2rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-text {
+  text-align: center;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+/* Upload Result */
+.upload-result {
+  padding: 2rem;
+  text-align: center;
+}
+
+.result-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2.5rem;
+}
+
+.result-icon.success {
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.result-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--gray-800);
+}
+
+.result-links {
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.link-group {
+  margin-bottom: 1rem;
+}
+
+.link-group:last-child {
+  margin-bottom: 0;
+}
+
+.link-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin-bottom: 0.5rem;
+}
+
+.link-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-input {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  background: var(--white);
+}
+
+.btn-copy {
+  padding: 0.5rem 0.875rem;
+}
+
+.result-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Upload Features */
+.upload-features {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--gray-100);
+  background: var(--gray-50);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+.feature-item i {
+  color: var(--success);
+}
+
+/* ============================================
+   Upload Result Page Styles
+   ============================================ */
+
+.upload-result-section {
+  padding: 2rem 0;
+}
+
+.result-card {
+  max-width: 700px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.result-header {
+  padding: 2.5rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.result-header .result-icon {
+  margin-bottom: 1.5rem;
+}
+
+.result-header .result-title {
+  margin-bottom: 0.5rem;
+}
+
+.result-desc {
+  color: var(--gray-600);
+  font-size: 1rem;
+}
+
+.result-body {
+  padding: 2rem;
+}
+
+.file-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.file-summary .file-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.file-info-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-info-text .file-name {
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+  font-size: 1rem;
+}
+
+.file-info-text .file-meta {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+}
+
+.links-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.link-box {
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.link-box .link-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.link-hint {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-weight: 400;
+}
+
+.link-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-input-wrap .link-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  background: var(--white);
+  word-break: break-all;
+}
+
+.link-input-wrap .btn-copy {
+  padding: 0.625rem 1rem;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.link-input-wrap .btn-copy:hover {
+  background: var(--primary-dark);
+}
+
+.result-card .result-actions {
+  padding: 0 2rem 2rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.result-card .result-actions .btn {
+  min-width: 140px;
+}

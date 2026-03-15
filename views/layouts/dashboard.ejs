@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title><%= title %> - <%= appName %></title>
+  <meta name="description" content="VyDrive Cloud Dashboard">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="dashboard-body">
+  <!-- Dashboard Sidebar -->
+  <%- include('../partials/sidebar') %>
+  
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Dashboard Header -->
+    <%- include('../partials/dashboard-header') %>
+    
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+      <%- body %>
+    </div>
+  </main>
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+  
+  <!-- Scripts -->
+  <script src="/js/main.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <% if (typeof scripts !== 'undefined' && scripts) { %>
+    <%- scripts %>
+  <% } %>
+</body>
+</html>

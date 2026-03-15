@@ -1,0 +1,115 @@
+<% layout("/layouts/dashboard") %>
+
+
+<div class="dashboard-header-section">
+  <h1 class="page-title">
+    <i class="fas fa-folder"></i> My Files
+  </h1>
+  <p class="page-subtitle">Kelola file yang telah Anda upload</p>
+</div>
+
+<!-- Files List -->
+<div class="dashboard-section">
+  <% if (files && files.length > 0) { %>
+    <div class="file-table-container">
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Size</th>
+            <th>Uploaded</th>
+            <th>Expires</th>
+            <th>Views</th>
+            <th>Downloads</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% files.forEach(function(file) { %>
+            <tr data-id="<%= file._id %>">
+              <td>
+                <div class="file-cell">
+                  <div class="file-icon-small">
+                    <% if (file.mimeType && file.mimeType.startsWith('image/')) { %>
+                      <i class="fas fa-image"></i>
+                    <% } else if (file.mimeType && file.mimeType.startsWith('video/')) { %>
+                      <i class="fas fa-video"></i>
+                    <% } else if (file.mimeType && file.mimeType.startsWith('audio/')) { %>
+                      <i class="fas fa-music"></i>
+                    <% } else { %>
+                      <i class="fas fa-file"></i>
+                    <% } %>
+                  </div>
+                  <span class="file-name" title="<%= file.originalName %>">
+                    <%= file.originalName.length > 30 ? file.originalName.substring(0, 30) + '...' : file.originalName %>
+                  </span>
+                </div>
+              </td>
+              <td><%= (file.size / 1024).toFixed(1) %> KB</td>
+              <td><%= new Date(file.createdAt).toLocaleDateString() %></td>
+              <td>
+                <% if (file.isPermanent) { %>
+                  <span class="badge badge-success">Permanent</span>
+                <% } else { %>
+                  <%= new Date(file.expiresAt).toLocaleDateString() %>
+                <% } %>
+              </td>
+              <td><%= file.views %></td>
+              <td><%= file.downloads %></td>
+              <td>
+                <div class="table-actions">
+                  <a href="/file/<%= file.filename %>" class="btn btn-icon btn-sm" title="View">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="/file/<%= file.filename %>/download" class="btn btn-icon btn-sm" title="Download">
+                    <i class="fas fa-download"></i>
+                  </a>
+                  <button type="button" class="btn btn-icon btn-sm btn-danger btn-delete-file" 
+                          data-filename="<%= file.filename %>" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <i class="fas fa-folder-open"></i>
+      <p>Belum ada file</p>
+      <a href="/file/upload" class="btn btn-primary">
+        <i class="fas fa-upload"></i> Upload File
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<script>
+// Delete file
+document.querySelectorAll('.btn-delete-file').forEach(btn => {
+  btn.addEventListener('click', async function() {
+    if (!confirm('Yakin ingin menghapus file ini?')) return;
+    
+    const filename = this.dataset.filename;
+    
+    try {
+      const response = await fetch(`/file/${filename}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showToast('File deleted successfully!', 'success');
+        this.closest('tr').remove();
+      } else {
+        showToast(data.message || 'Failed to delete file', 'error');
+      }
+    } catch (error) {
+      showToast('Error deleting file', 'error');
+    }
+  });
+});
+</script>

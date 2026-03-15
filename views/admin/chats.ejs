@@ -1,0 +1,47 @@
+<% layout('/layouts/dashboard') %>
+
+<div class="dashboard-header-section">
+  <h1 class="page-title"><i class="fas fa-comments"></i> Kelola Chat</h1>
+  <p class="page-subtitle">Pesan live chat terbaru</p>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="alert alert-danger"><i class="fas fa-times-circle"></i> <%= error %></div>
+<% } %>
+
+<div class="dashboard-section">
+  <h2 class="section-title"><i class="fas fa-list"></i> Pesan Chat (<%= messages.length %>)</h2>
+
+  <% if (messages && messages.length > 0) { %>
+  <div class="table-responsive">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Pesan</th>
+          <th>Waktu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% messages.forEach(function(msg) { %>
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <i class="fas fa-user-circle" style="color:var(--primary-color);"></i>
+              <strong><%= msg.username || msg.userId || 'Guest' %></strong>
+            </div>
+          </td>
+          <td><%= msg.message || msg.content || '-' %></td>
+          <td><small><%= msg.createdAt ? new Date(msg.createdAt).toLocaleString('id-ID') : '-' %></small></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <i class="fas fa-comment-slash fa-3x" style="color:var(--text-muted);margin-bottom:1rem;"></i>
+    <p class="text-muted">Belum ada pesan chat</p>
+  </div>
+  <% } %>
+</div>

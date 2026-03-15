@@ -1,0 +1,157 @@
+<% layout('/layouts/main') %>
+
+<section class="upload-result-section">
+  <div class="container">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-icon success">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 class="result-title">Upload Berhasil!</h1>
+        <p class="result-desc">File Anda telah berhasil diupload ke cloud storage.</p>
+      </div>
+
+      <div class="result-body">
+        <!-- File Info -->
+        <div class="file-summary">
+          <div class="file-icon">
+            <% if (file.mimeType && file.mimeType.startsWith('image/')) { %>
+              <i class="fas fa-image"></i>
+            <% } else if (file.mimeType && file.mimeType.startsWith('video/')) { %>
+              <i class="fas fa-video"></i>
+            <% } else if (file.mimeType && file.mimeType.startsWith('audio/')) { %>
+              <i class="fas fa-music"></i>
+            <% } else if (file.mimeType === 'application/pdf') { %>
+              <i class="fas fa-file-pdf"></i>
+            <% } else { %>
+              <i class="fas fa-file"></i>
+            <% } %>
+          </div>
+          <div class="file-info-text">
+            <h4 class="file-name" title="<%= file.originalName %>"><%= file.originalName %></h4>
+            <p class="file-meta">
+              <%= (file.size / 1024).toFixed(1) %> KB • 
+              <%= file.isPermanent ? 'Permanen' : 'Expired: ' + new Date(file.expiresAt).toLocaleDateString() %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="links-container">
+          <div class="link-box">
+            <label class="link-label">
+              <i class="fas fa-link"></i> Direct Link
+              <span class="link-hint">Untuk embed atau download langsung</span>
+            </label>
+            <div class="link-input-wrap">
+              <input type="text" id="directLink" class="link-input" value="<%= directUrl %>" readonly>
+              <button type="button" class="btn btn-copy" data-target="directLink">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="link-box">
+            <label class="link-label">
+              <i class="fas fa-eye"></i> View Link
+              <span class="link-hint">Halaman preview dengan detail file</span>
+            </label>
+            <div class="link-input-wrap">
+              <input type="text" id="viewLink" class="link-input" value="<%= viewUrl %>" readonly>
+              <button type="button" class="btn btn-copy" data-target="viewLink">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="link-box">
+            <label class="link-label">
+              <i class="fas fa-download"></i> Download Link
+              <span class="link-hint">Link download langsung</span>
+            </label>
+            <div class="link-input-wrap">
+              <input type="text" id="downloadLink" class="link-input" value="<%= downloadUrl %>" readonly>
+              <button type="button" class="btn btn-copy" data-target="downloadLink">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <a href="<%= viewUrl %>" class="btn btn-secondary" target="_blank">
+          <i class="fas fa-eye"></i> Preview
+        </a>
+        <a href="<%= downloadUrl %>" class="btn btn-primary">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <a href="/file/upload" class="btn btn-outline">
+          <i class="fas fa-cloud-upload-alt"></i> Upload Lagi
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Copy buttons functionality
+  document.querySelectorAll('.btn-copy').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetId = this.dataset.target;
+      const input = document.getElementById(targetId);
+      
+      navigator.clipboard.writeText(input.value).then(() => {
+        const icon = this.querySelector('i');
+        icon.classList.remove('fa-copy');
+        icon.classList.add('fa-check');
+        
+        // Show toast notification
+        showToast('Link copied to clipboard!', 'success');
+        
+        setTimeout(() => {
+          icon.classList.remove('fa-check');
+          icon.classList.add('fa-copy');
+        }, 2000);
+      });
+    });
+  });
+});
+
+// Toast notification function (fallback if main.js is not loaded)
+function showToast(message, type = 'info') {
+  if (typeof window.showToast === 'function' && window.showToast !== showToast) {
+    window.showToast(message, type);
+    return;
+  }
+  
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+    <span>${message}</span>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 3000);
+}
+</script>

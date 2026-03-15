@@ -1,0 +1,117 @@
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="sidebar-logo">
+      <i class="fas fa-cloud"></i>
+      <span>VyDrive</span>
+    </a>
+    <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <% if (user && user.isAdmin) { %>
+      <div class="sidebar-section-label">Admin</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/admin" class="sidebar-link <%= currentPath === '/admin' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-chart-pie"></i></span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/files" class="sidebar-link <%= currentPath === '/admin/files' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-folder-open"></i></span>
+            <span>Kelola File</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/users" class="sidebar-link <%= currentPath === '/admin/users' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-users"></i></span>
+            <span>Kelola Users</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/chats" class="sidebar-link <%= currentPath === '/admin/chats' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-comments"></i></span>
+            <span>Kelola Chat</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/logs" class="sidebar-link <%= currentPath === '/admin/logs' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-list-ul"></i></span>
+            <span>API Logs</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Tools</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/file/upload" class="sidebar-link">
+            <span class="sidebar-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+            <span>Upload File</span>
+          </a>
+        </li>
+      </ul>
+    <% } else { %>
+      <div class="sidebar-section-label">Menu</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/dashboard" class="sidebar-link <%= currentPath === '/dashboard' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-home"></i></span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/dashboard/files" class="sidebar-link <%= currentPath === '/dashboard/files' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-folder-open"></i></span>
+            <span>My Files</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/dashboard/vydb" class="sidebar-link <%= currentPath === '/dashboard/vydb' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-database"></i></span>
+            <span>VyDB</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/dashboard/profile" class="sidebar-link <%= currentPath === '/dashboard/profile' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-user-circle"></i></span>
+            <span>Profile</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Aksi</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="/file/upload" class="sidebar-link">
+            <span class="sidebar-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+            <span>Upload File</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/chat" class="sidebar-link <%= currentPath === '/chat' ? 'active' : '' %>">
+            <span class="sidebar-icon"><i class="fas fa-comments"></i></span>
+            <span>Live Chat</span>
+          </a>
+        </li>
+      </ul>
+    <% } %>
+
+    <div class="sidebar-divider"></div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item">
+        <a href="/auth/logout" class="sidebar-link sidebar-link-danger">
+          <span class="sidebar-icon"><i class="fas fa-sign-out-alt"></i></span>
+          <span>Logout</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>

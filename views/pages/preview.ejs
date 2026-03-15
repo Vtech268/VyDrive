@@ -1,0 +1,147 @@
+<% layout('/layouts/main') %>
+
+<section class="preview-section">
+  <div class="container">
+    <div class="preview-container">
+      <!-- File Info Header -->
+      <div class="preview-header">
+        <div class="file-icon">
+          <% if (isImage) { %>
+            <i class="fas fa-image"></i>
+          <% } else if (isVideo) { %>
+            <i class="fas fa-video"></i>
+          <% } else if (isAudio) { %>
+            <i class="fas fa-music"></i>
+          <% } else if (isPDF) { %>
+            <i class="fas fa-file-pdf"></i>
+          <% } else { %>
+            <i class="fas fa-file"></i>
+          <% } %>
+        </div>
+        <div class="file-info">
+          <h1 class="file-title"><%= file.originalName %></h1>
+          <div class="file-meta">
+            <span class="meta-item">
+              <i class="fas fa-weight-hanging"></i> <%= (file.size / 1024).toFixed(2) %> KB
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-eye"></i> <%= file.views %> views
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-download"></i> <%= file.downloads %> downloads
+            </span>
+            <% if (file.isPermanent) { %>
+              <span class="meta-item meta-permanent">
+                <i class="fas fa-infinity"></i> Permanent
+              </span>
+            <% } else { %>
+              <span class="meta-item">
+                <i class="fas fa-clock"></i> Expires: <%= new Date(file.expiresAt).toLocaleDateString() %>
+              </span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Preview Content -->
+      <div class="preview-content">
+        <% if (isImage) { %>
+          <div class="preview-image">
+            <img src="<%= directUrl %>" alt="<%= file.originalName %>" loading="lazy">
+          </div>
+        <% } else if (isVideo) { %>
+          <div class="preview-video">
+            <video controls preload="metadata">
+              <source src="<%= directUrl %>" type="<%= file.mimeType %>">
+              Browser Anda tidak mendukung pemutaran video.
+            </video>
+          </div>
+        <% } else if (isAudio) { %>
+          <div class="preview-audio">
+            <audio controls preload="metadata">
+              <source src="<%= directUrl %>" type="<%= file.mimeType %>">
+              Browser Anda tidak mendukung pemutaran audio.
+            </audio>
+          </div>
+        <% } else if (isPDF) { %>
+          <div class="preview-pdf">
+            <% if (file.googleDriveId.startsWith('mock_')) { %>
+            <iframe src="<%= directUrl %>" 
+                    frameborder="0" 
+                    allowfullscreen>
+            </iframe>
+            <% } else { %>
+            <iframe src="https://drive.google.com/file/d/<%= file.googleDriveId %>/preview" 
+                    frameborder="0" 
+                    allowfullscreen>
+            </iframe>
+            <% } %>
+          </div>
+        <% } else { %>
+          <div class="preview-unsupported">
+            <i class="fas fa-file"></i>
+            <p>Preview tidak tersedia untuk file ini.</p>
+            <p>Silakan download file untuk melihat konten.</p>
+          </div>
+        <% } %>
+      </div>
+      
+      <!-- Actions -->
+      <div class="preview-actions">
+        <a href="/file/<%= file.filename %>/download" class="btn btn-primary btn-lg">
+          <i class="fas fa-download"></i> Download File
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="copyLink()">
+          <i class="fas fa-link"></i> Copy Link
+        </button>
+        <% if (!file.googleDriveId.startsWith('mock_')) { %>
+        <button type="button" class="btn btn-outline" onclick="window.open('https://drive.google.com/file/d/<%= file.googleDriveId %>/view', '_blank')">
+          <i class="fab fa-google-drive"></i> Open in Drive
+        </button>
+        <% } %>
+      </div>
+      
+      <!-- Share Section -->
+      <div class="share-section">
+        <h3 class="share-title"><i class="fas fa-share-alt"></i> Bagikan</h3>
+        <div class="share-buttons">
+          <a href="https://wa.me/?text=<%= encodeURIComponent('Lihat file ini: ' + 'https://' + config.app.domain + '/file/' + file.filename) %>" 
+             target="_blank" class="share-btn share-whatsapp">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+          </a>
+          <a href="https://t.me/share/url?url=<%= encodeURIComponent('https://' + config.app.domain + '/file/' + file.filename) %>" 
+             target="_blank" class="share-btn share-telegram">
+            <i class="fab fa-telegram"></i> Telegram
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://' + config.app.domain + '/file/' + file.filename) %>" 
+             target="_blank" class="share-btn share-facebook">
+            <i class="fab fa-facebook"></i> Facebook
+          </a>
+          <button type="button" class="share-btn share-copy" onclick="copyLink()">
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function copyLink() {
+  const link = window.location.href;
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('Link copied to clipboard!', 'success');
+  }).catch(() => {
+    showToast('Failed to copy link', 'error');
+  });
+}
+
+function showToast(message, type) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+</script>
