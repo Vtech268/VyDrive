@@ -1,0 +1,62 @@
+{
+  "web": {
+    "client_id": "1038912701642-0mc4miaae81ntv4s185els6u428lqeg1.apps.googleusercontent.com",
+    "project_id": "long-flame-470917-m6",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "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",
+    "redirect_uris": [
+      "https://vydrive.zone.id/oauth2callback",
+      "https://vydrive.vercel.app/oauth2callback",
+      "https://e7438514-6caa-4f8f-8e13-3d51c2a52db0-00-26c73lep9z753.pike.replit.dev/oauth2callback",
+      "https://b60e2ba1-6042-4f89-a0ee-d39172196103-00-3ribqfqzj3feb.sisko.replit.dev/oauth2callback",
+      "https://09a5b188-d1a8-43d9-bbf6-f549ec428b46-00-3tyu0mqj96uii.sisko.replit.dev/oauth2callback",
+      "https://fb4b1c19-0346-40db-8544-5f43b6eedd3d-00-14ioi9olo2i36.pike.replit.dev/oauth2callback"
+    ],
+    "javascript_origins": [
+      "https://vydrive.zone.id",
+      "https://vydrive.vercel.app",
+      "https://e7438514-6caa-4f8f-8e13-3d51c2a52db0-00-26c73lep9z753.pike.replit.dev",
+      "https://b60e2ba1-6042-4f89-a0ee-d39172196103-00-3ribqfqzj3feb.sisko.replit.dev",
+      "https://09a5b188-d1a8-43d9-bbf6-f549ec428b46-00-3tyu0mqj96uii.sisko.replit.dev"
+    ]
+  },
+  "GOOGLE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDeId0/Y8/EdNX5\n7uu7KQ3AdT+b2WZYqehqFwEjgQGzfxOLfV4aUJxPZBFib8Krk3xRmQ1Jh8pYkIdp\nbAto6VH97HFIF4yNoJMCHuSAvMgoazrwtw1gX26SGQz82ytF1A9Q/J9fAyh6pk8Z\niodqdCqa7tWZMh9ABkr8+4q4oEE3RpZ1P9fqpQBXaTsRuhUxQtPJLu835wMwckP2\nUg5LfOg1icALWVwmhX2PUpCIYL8Y2nOcqgJm6EopC+8gVcHWkK7yNTK28ajprNB5\njF5cSzeE5IqiAkN5JjUrkuz8VLlZsXw1ra4402QudpmfSvtJRok81V7zAM1tmUMt\nYbyfycO5AgMBAAECggEAWdaVXkFWcsyUC+jSwxfH/YoOB1CmIX7aRin2pm7TCs7+\nzyANkpP+m+dLVqX/tBfKpE/DvXTjY+1ULtFpTe1rYUiiyjbn/BGw0x8+aEixpRM1\nO8y05sDB/emOxKc5eZzZ8vWw2SL0WKJxhFFwEiBYaN/mWHaah/DjnCx5vtDlf15W\nVSbZyAuzRLbUiAj4MKfqM0pVBYHhwzkFYh/yscVHwl3/IIl7haNWqg3Qpt85TUco\n12ntJXM+mf8b9WGHnbUxf2eNlEDhgbG/AUHrHtWpyUD97Xs7o8UoA9/jaYUyltIp\nY3K+IwVm8qme5pgu0vKE/T0uf89JlbN1AgTgikJ59wKBgQD9bHUNbQs0CDiaQEpJ\nZW7wh1APnc+xESrmQZi7eu7iQbOpu8i2YHTmdk2xtqFPeMorJeTrp1a7ogB4JSdd\nXBr3OngU+Wim2qsPkkXVXc6CDzb3rgiMgi3j7870vVInU0VEipuUUfAWK2KfJtm6\nuGa7vAPMbEuQji8ufhm/kgMvawKBgQDgY/hiTA7uihhtQNxKjmn1/hj0tP7UUiRQ\nlWnBNmwAWCj/38NzNMP92DOuun3b3J39U2/c4GTD+r2KnKZnEvyYR14vJsXwsTAT\n9yPgkuKjJfDN4QdscNExfazYRKUHK9ss9ziLpp2rDO3NlgBDt9ZuDoFcsz6pt8Vs\nP2tGWFVWawKBgGpX0cKhiHr8HCx2X/Xur6AVV/5FnbrS1mqrChlaG9Yr9eV63F3T\nmhp/eFjjp0s/B68VhrtwjA/Oil3gUWV22gX2rh83Dbg+uFufaNiBNcAT/F/w0ruL\ngRBOOE0xCMFhywZZF7IktBfJeugIGIOnD80lt35Xz1nIoHnlBo8CCX4jAoGBANnY\n9KoqAU0hEPnwwG45uTGzkXLxzX1AijUZ+eQ0+8GR1awlB9HvZmAp6HM4ZzxvAYuR\n18ZurCWAZ0gNMZhcXJNSpmPMlttIis63X0OGFzYhfZnDYLutA8uyoX4NltJRh6Yu\nFd2u0t/f23d+q58S+cE7n+fptWp8GdUv9OwEkkUlAoGARk47n3qce9gcJYtarEs1\nx9pXoF0e0d38ZLSiVgRG+Nbqd1EHzUT5qKDT657/gZco61e2G8IuyuTdsqHHYHNI\nVYFOx07Jf/XGJrzEIdc/+fCiO3pUB5Ddzo4ujMdDmApkVLLGcd+BGtC+niB/9NdC\nQcdLKrBv7NjobdEGVip2Z84=\n-----END PRIVATE KEY-----\n",
+  "GOOGLE_CLIENT_EMAIL": "pinaa-439@long-flame-470917-m6.iam.gserviceaccount.com",
+  "GOOGLE_PRIVATE_KEY_ID": "3318b9c631c2c4fae8239f8c0ba4c8951a983c49",
+  "GOOGLE_PROJECT_ID": "long-flame-470917-m6",
+  "GOOGLE_SHEET_ID": "1FpmjthaNkVZo7tsG2InZHdE6jj_aEd010AmA74A9fcM",
+  "GOOGLE_DRIVE_FOLDER_ID": "1FlEKWGK8ktRKTT7aP5G6ETC9h_Ee8nfk",
+  "admin_username": "admin",
+  "admin_password": "admin123",
+  "MONGODB_URI": "mongodb+srv://Vercel-Admin-biolink:JMQ0gbLcBclyj6mP@biolink.uczf4en.mongodb.net/vydrive?retryWrites=true&w=majority",
+  "MONGODB_URI_FALLBACK": "mongodb+srv://Vercel-Admin-biolink:JMQ0gbLcBclyj6mP@biolink.uczf4en.mongodb.net/vydrive_backup?retryWrites=true&w=majority",
+  "plans": {
+    "free": {
+      "name": "Free",
+      "max_file_size": 104857600,
+      "max_storage": 1073741824,
+      "max_files_per_day": 10,
+      "allowed_types": [
+        "*"
+      ]
+    },
+    "paid": {
+      "name": "Paid",
+      "max_file_size": 1073741824,
+      "max_storage": 10737418240,
+      "max_files_per_day": 100,
+      "allowed_types": [
+        "*"
+      ]
+    }
+  },
+  "app": {
+    "name": "VyDrive Cloud",
+    "version": "0.2.0",
+    "domain": "vydrive.zone.id",
+    "session_secret": "vydrive_secret_key_2024_secure_random_string"
+  },
+  "DRIVE_REFRESH_TOKEN": "1//0gt0qWhEy2HCiCgYIARAAGBASNwF-L9Iro-aFFdFB2YXxflrLiJe46-SA7aow2CRnqJWX-_h9Y7fbrg86kvohoCA13azfl14flCU"
+}
