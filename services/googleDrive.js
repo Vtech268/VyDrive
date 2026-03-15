@@ -7,19 +7,8 @@ function getConfig() {
   return require('../config/config.json');
 }
 
-// Vercel filesystem is read-only — use /tmp for temporary storage
-const IS_VERCEL = !!(process.env.VERCEL || process.env.NOW_REGION);
-const MOCK_STORAGE_DIR = IS_VERCEL
-  ? '/tmp/mock-drive'
-  : path.join(__dirname, '..', 'public', 'mock-drive');
-
-try {
-  if (!fs.existsSync(MOCK_STORAGE_DIR)) {
-    fs.mkdirSync(MOCK_STORAGE_DIR, { recursive: true });
-  }
-} catch (e) {
-  console.warn('[WARN] Could not create mock-drive dir:', e.message);
-}
+// Always use /tmp for mock storage — writable in ALL environments (local, Vercel, etc.)
+const MOCK_STORAGE_DIR = '/tmp/mock-drive';
 
 const mockFiles = new Map();
 
@@ -93,18 +82,14 @@ async function exchangeCodeForToken(code, redirectUri) {
 }
 
 function saveRefreshToken(refreshToken) {
-  if (IS_VERCEL) {
-    // On Vercel, filesystem is read-only — log only, token can't be persisted
-    console.log('[VERCEL] saveRefreshToken: filesystem is read-only, token not persisted.');
-    return;
-  }
   const configPath = path.join(__dirname, '..', 'config', 'config.json');
   try {
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     config.DRIVE_REFRESH_TOKEN = refreshToken;
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   } catch (e) {
-    console.warn('[WARN] saveRefreshToken failed:', e.message);
+    // On Vercel/read-only filesystems, this will silently skip
+    console.warn('[WARN] saveRefreshToken failed (read-only fs?):', e.message);
   }
 }
 
