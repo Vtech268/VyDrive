@@ -3,24 +3,26 @@ const path = require('path');
 const fs = require('fs');
 const config = require('../config');
 
-const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
-
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Di Vercel, filesystem read-only kecuali /tmp
+// Gunakan /tmp/uploads sebagai fallback
+let uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (e) {
+  uploadsDir = path.join('/tmp', 'uploads');
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (e2) {
+    console.warn('⚠️  Could not create uploads dir:', e2.message);
+  }
 }
 
-// Storage configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    // Generate random filename (8 karakter)
-    const randomName = Math.random().toString(36).substring(2, 10);
-    const ext = path.extname(file.originalname);
-    cb(null, randomName + ext);
-  }
-});
+// Storage configuration - gunakan memory storage agar kompatibel dengan Vercel serverless
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {

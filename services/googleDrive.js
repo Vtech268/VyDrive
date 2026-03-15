@@ -102,7 +102,7 @@ function saveRefreshToken(refreshToken) {
   }
 }
 
-async function storeFileMock(filePath, fileName, mimeType) {
+async function storeFileMock(filePathOrBuffer, fileName, mimeType) {
   try {
     if (!fs.existsSync(MOCK_STORAGE_DIR)) {
       fs.mkdirSync(MOCK_STORAGE_DIR, { recursive: true });
@@ -112,7 +112,11 @@ async function storeFileMock(filePath, fileName, mimeType) {
   }
   const fileId = 'mock_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
   const mockPath = path.join(MOCK_STORAGE_DIR, fileId);
-  fs.copyFileSync(filePath, mockPath);
+  if (Buffer.isBuffer(filePathOrBuffer)) {
+    fs.writeFileSync(mockPath, filePathOrBuffer);
+  } else {
+    fs.copyFileSync(filePathOrBuffer, mockPath);
+  }
   const stats = fs.statSync(mockPath);
   const mockData = {
     id: fileId,
@@ -134,13 +138,25 @@ async function storeFileMock(filePath, fileName, mimeType) {
   };
 }
 
-async function uploadFile(filePath, fileName, mimeType) {
+async function uploadFile(filePathOrBuffer, fileName, mimeType) {
   const config = getConfig();
   const drive = getDriveClient();
+  const { Readable } = require('stream');
+
+  // Buat stream dari buffer atau file path
+  function makeStream(src) {
+    if (Buffer.isBuffer(src)) {
+      const s = new Readable();
+      s.push(src);
+      s.push(null);
+      return s;
+    }
+    return fs.createReadStream(src);
+  }
 
   if (!drive) {
-    console.log('[LOCAL] No Drive client, storing locally:', fileName);
-    return storeFileMock(filePath, fileName, mimeType);
+    console.log('[LOCAL] No Drive client, using mock:', fileName);
+    return storeFileMock(filePathOrBuffer, fileName, mimeType);
   }
 
   try {
@@ -151,7 +167,7 @@ async function uploadFile(filePath, fileName, mimeType) {
 
     const media = {
       mimeType,
-      body: fs.createReadStream(filePath)
+      body: makeStream(filePathOrBuffer)
     };
 
     const response = await drive.files.create({
@@ -175,8 +191,8 @@ async function uploadFile(filePath, fileName, mimeType) {
     };
   } catch (error) {
     console.error('Google Drive upload error:', error.message);
-    console.log('[FALLBACK] Storing locally:', fileName);
-    return storeFileMock(filePath, fileName, mimeType);
+    console.log('[FALLBACK] Using mock:', fileName);
+    return storeFileMock(filePathOrBuffer, fileName, mimeType);
   }
 }
 

@@ -27,13 +27,19 @@ async function uploadFileHandler(req, res) {
     }
 
     const { expiresIn = '7' } = req.body;
-    const filePath = req.file.path;
+    // Support memory storage (buffer) dan disk storage (path)
+    const fileBuffer = req.file.buffer || null;
+    const filePath = req.file.path || null;
+    const fileSource = fileBuffer || filePath;
     const originalName = req.file.originalname;
     const mimeType = req.file.mimetype;
     const size = req.file.size;
 
-    // Generate short filename
-    const shortName = path.basename(req.file.filename);
+    // Generate short filename (8 karakter random + ext)
+    const ext = path.extname(originalName);
+    const shortName = req.file.filename
+      ? path.basename(req.file.filename)
+      : Math.random().toString(36).substring(2, 10) + ext;
 
     // Calculate expiry date
     let expiresAt;
@@ -48,8 +54,8 @@ async function uploadFileHandler(req, res) {
       expiresAt.setDate(expiresAt.getDate() + days);
     }
 
-    // Upload to Google Drive
-    const driveResult = await uploadFile(filePath, originalName, mimeType);
+    // Upload to Google Drive (bisa menerima buffer atau path)
+    const driveResult = await uploadFile(fileSource, originalName, mimeType);
 
     // Save to MongoDB
     const fileDoc = new File({
@@ -68,8 +74,10 @@ async function uploadFileHandler(req, res) {
 
     await fileDoc.save();
 
-    // Delete local file
-    fs.unlinkSync(filePath);
+    // Delete local file jika pakai disk storage
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
 
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     
@@ -91,8 +99,8 @@ async function uploadFileHandler(req, res) {
   } catch (error) {
     console.error('Upload error:', error);
     
-    // Clean up local file if exists
-    if (req.file && fs.existsSync(req.file.path)) {
+    // Clean up local file if exists (disk storage only)
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
     
