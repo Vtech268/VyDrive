@@ -15,6 +15,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
 const chatRoutes = require('./routes/chat');
+const scriptRoutes = require('./routes/script');
 
 // Import services
 const { initMongoDB } = require('./services/mongodb');
@@ -135,6 +136,7 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/api', apiRoutes);
 app.use('/admin', adminRoutes);
 app.use('/chat', chatRoutes);
+app.use('/script', scriptRoutes);
 
 // Google Drive OAuth callback
 const { exchangeCodeForToken, saveRefreshToken } = require('./services/googleDrive');

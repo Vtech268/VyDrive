@@ -1,0 +1,299 @@
+<% layout('/layouts/main') %>
+
+<section class="upload-section">
+  <div class="container" style="max-width:780px;">
+    <div class="upload-container">
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+        <a href="javascript:history.back()" style="color:var(--text-muted,#888);font-size:20px;"><i class="fas fa-arrow-left"></i></a>
+        <h1 style="margin:0;font-size:1.25rem;font-weight:700;letter-spacing:1px;">UPLOAD KE SHEET</h1>
+      </div>
+
+      <!-- Sheet name -->
+      <div style="background:var(--card-bg,#1e1e2e);border:1px solid #5c6bc055;border-radius:12px;padding:20px;margin-bottom:14px;">
+        <label style="display:block;font-size:11px;color:#7986cb;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">
+          <i class="fas fa-table"></i> Nama Sheet (Tab Google Sheets)
+        </label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="text" id="sheetName" value="scripts" placeholder="contoh: users, produk, laporan..."
+            style="flex:1;background:#0d0d1a;border:1px solid #5c6bc055;color:#c5cae9;border-radius:8px;padding:10px 14px;font-size:14px;font-family:'Fira Code',monospace;">
+          <button type="button" onclick="loadExistingSheets()" title="Load sheet yang ada"
+            style="background:#333;color:#aaa;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;white-space:nowrap;font-size:13px;">
+            <i class="fas fa-sync-alt"></i> Sheet Saya
+          </button>
+        </div>
+        <p style="margin:6px 0 0;font-size:11px;color:#666;">Jika belum ada, sheet baru otomatis dibuat. Kolom menyesuaikan field yang kamu kirim.</p>
+
+        <div id="existingSheetsList" style="display:none;margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+
+      <!-- Mode selector -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button type="button" id="modeForm" onclick="setMode('form')"
+          style="flex:1;padding:10px;border-radius:8px;border:1px solid #5c6bc0;background:#5c6bc022;color:#7986cb;cursor:pointer;font-size:13px;font-weight:600;">
+          <i class="fas fa-list"></i> Form Builder
+        </button>
+        <button type="button" id="modeJson" onclick="setMode('json')"
+          style="flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:transparent;color:#888;cursor:pointer;font-size:13px;font-weight:600;">
+          <i class="fas fa-code"></i> JSON Langsung
+        </button>
+      </div>
+
+      <!-- FORM MODE -->
+      <div id="formMode">
+        <div style="background:var(--card-bg,#1e1e2e);border:1px solid var(--border,#333);border-radius:12px;padding:20px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <span style="font-size:11px;color:#aaa;letter-spacing:1px;text-transform:uppercase;">FIELD DATA</span>
+            <button type="button" onclick="addField()"
+              style="background:#5c6bc022;color:#7986cb;border:1px solid #5c6bc055;border-radius:6px;padding:5px 14px;cursor:pointer;font-size:12px;">
+              <i class="fas fa-plus"></i> Tambah Field
+            </button>
+          </div>
+
+          <div id="fieldsContainer"></div>
+        </div>
+
+        <div style="background:var(--card-bg,#1e1e2e);border:1px solid var(--border,#333);border-radius:12px;padding:20px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:11px;color:#ff6b6b;letter-spacing:1px;text-transform:uppercase;">PREVIEW JSON</span>
+            <button type="button" onclick="copyJson()"
+              style="background:transparent;color:#666;border:none;cursor:pointer;font-size:12px;">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          <pre id="jsonPreview" style="background:#0d0d1a;border-radius:8px;padding:14px;font-size:12px;color:#a5d6a7;overflow-x:auto;margin:0;white-space:pre-wrap;"></pre>
+        </div>
+
+        <button type="button" onclick="submitForm()"
+          style="width:100%;background:linear-gradient(135deg,#6c63ff,#4facfe);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;">
+          <i class="fas fa-cloud-upload-alt"></i> Simpan ke Sheet
+        </button>
+      </div>
+
+      <!-- JSON MODE -->
+      <div id="jsonMode" style="display:none;">
+        <div style="background:var(--card-bg,#1e1e2e);border:1px solid var(--border,#333);border-radius:12px;padding:20px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:11px;color:#aaa;letter-spacing:1px;text-transform:uppercase;">JSON PAYLOAD</span>
+            <span style="font-size:11px;color:#666;">Tanpa field <code style="color:#7986cb;">_sheet</code> — sheet sudah diset di atas</span>
+          </div>
+          <textarea id="jsonInput" rows="16" placeholder='{\n  "nama": "Caliph",\n  "judul": "ShortUrl Class",\n  "kode": "...",\n  "kategori": "tool"\n}'
+            style="width:100%;background:#0d0d1a;border:1px solid #2a2a40;color:#e0e0ff;border-radius:8px;padding:16px;font-family:'Fira Code','Courier New',monospace;font-size:13px;line-height:1.6;resize:vertical;box-sizing:border-box;"
+            oninput="validateJson(this)"></textarea>
+          <div id="jsonError" style="color:#ef5350;font-size:11px;margin-top:6px;display:none;"></div>
+        </div>
+
+        <button type="button" onclick="submitJson()"
+          style="width:100%;background:linear-gradient(135deg,#6c63ff,#4facfe);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;">
+          <i class="fas fa-cloud-upload-alt"></i> Simpan ke Sheet
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div id="resultBox" style="display:none;border-radius:12px;padding:20px;margin-top:16px;"></div>
+
+      <!-- API Info -->
+      <details style="margin-top:20px;">
+        <summary style="cursor:pointer;color:#666;font-size:12px;padding:8px 0;"><i class="fas fa-code"></i> Lihat cara kirim via API / fetch</summary>
+        <div style="background:#0d0d1a;border-radius:8px;padding:16px;margin-top:8px;font-family:'Fira Code',monospace;font-size:12px;color:#a5d6a7;overflow-x:auto;">
+<pre style="margin:0;">// Kirim format apapun, sheet auto-dibuat
+fetch('/script/upload', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    _sheet: 'nama_sheet_kamu',  // tab Google Sheets
+    field1: 'nilai1',
+    field2: 'nilai2',
+    // ... field bebas, kolom otomatis
+  })
+})
+
+// Baca data dari sheet
+fetch('/script/data/nama_sheet_kamu')
+
+// List semua sheet
+fetch('/script/sheets')</pre>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<script>
+let currentMode = 'form';
+let fieldCount = 0;
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('formMode').style.display = mode === 'form' ? 'block' : 'none';
+  document.getElementById('jsonMode').style.display = mode === 'json' ? 'block' : 'none';
+  document.getElementById('modeForm').style.background = mode === 'form' ? '#5c6bc022' : 'transparent';
+  document.getElementById('modeForm').style.color = mode === 'form' ? '#7986cb' : '#888';
+  document.getElementById('modeForm').style.borderColor = mode === 'form' ? '#5c6bc0' : '#333';
+  document.getElementById('modeJson').style.background = mode === 'json' ? '#5c6bc022' : 'transparent';
+  document.getElementById('modeJson').style.color = mode === 'json' ? '#7986cb' : '#888';
+  document.getElementById('modeJson').style.borderColor = mode === 'json' ? '#5c6bc0' : '#333';
+}
+
+const FIELD_TYPES = ['text', 'textarea', 'number', 'url', 'email', 'date'];
+
+function addField(key = '', value = '', type = 'text') {
+  fieldCount++;
+  const id = 'field_' + fieldCount;
+  const container = document.getElementById('fieldsContainer');
+  const div = document.createElement('div');
+  div.id = id;
+  div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;';
+  div.innerHTML = `
+    <input type="text" placeholder="nama_field" value="${key}" oninput="updatePreview()"
+      style="width:160px;min-width:120px;background:#0d0d1a;border:1px solid #333;color:#c5cae9;border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Fira Code',monospace;"
+      class="fkey">
+    <select onchange="changeFieldType(this, '${id}')" style="background:#0d0d1a;border:1px solid #333;color:#888;border-radius:8px;padding:9px 10px;font-size:12px;cursor:pointer;">
+      ${FIELD_TYPES.map(t => `<option value="${t}" ${t===type?'selected':''}>${t}</option>`).join('')}
+    </select>
+    <div style="flex:1;" class="fval-wrap">
+      ${type === 'textarea'
+        ? `<textarea rows="4" placeholder="nilai..." oninput="updatePreview()" class="fval" style="width:100%;background:#0d0d1a;border:1px solid #333;color:#eee;border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Fira Code',monospace;resize:vertical;box-sizing:border-box;">${value}</textarea>`
+        : `<input type="${type}" placeholder="nilai..." value="${value}" oninput="updatePreview()" class="fval" style="width:100%;background:#0d0d1a;border:1px solid #333;color:#eee;border-radius:8px;padding:9px 12px;font-size:13px;box-sizing:border-box;">`
+      }
+    </div>
+    <button type="button" onclick="removeField('${id}')" style="background:#ff4d4d22;color:#ff6b6b;border:1px solid #ff4d4d44;border-radius:8px;padding:9px 12px;cursor:pointer;"><i class="fas fa-times"></i></button>
+  `;
+  container.appendChild(div);
+  updatePreview();
+}
+
+function changeFieldType(sel, id) {
+  const type = sel.value;
+  const wrap = document.querySelector(`#${id} .fval-wrap`);
+  const current = wrap.querySelector('.fval');
+  const val = current ? current.value : '';
+  if (type === 'textarea') {
+    wrap.innerHTML = `<textarea rows="4" placeholder="nilai..." oninput="updatePreview()" class="fval" style="width:100%;background:#0d0d1a;border:1px solid #333;color:#eee;border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Fira Code',monospace;resize:vertical;box-sizing:border-box;">${val}</textarea>`;
+  } else {
+    wrap.innerHTML = `<input type="${type}" placeholder="nilai..." value="${val}" oninput="updatePreview()" class="fval" style="width:100%;background:#0d0d1a;border:1px solid #333;color:#eee;border-radius:8px;padding:9px 12px;font-size:13px;box-sizing:border-box;">`;
+  }
+  updatePreview();
+}
+
+function removeField(id) {
+  document.getElementById(id).remove();
+  updatePreview();
+}
+
+function getFormData() {
+  const obj = {};
+  document.querySelectorAll('#fieldsContainer > div').forEach(row => {
+    const k = row.querySelector('.fkey').value.trim();
+    const v = row.querySelector('.fval').value;
+    if (k) obj[k] = v;
+  });
+  return obj;
+}
+
+function updatePreview() {
+  const data = getFormData();
+  document.getElementById('jsonPreview').textContent = JSON.stringify(data, null, 2);
+}
+
+function copyJson() {
+  navigator.clipboard.writeText(document.getElementById('jsonPreview').textContent);
+}
+
+function validateJson(el) {
+  const err = document.getElementById('jsonError');
+  try {
+    JSON.parse(el.value);
+    err.style.display = 'none';
+    el.style.borderColor = '#2a2a40';
+  } catch (e) {
+    err.textContent = '⚠ ' + e.message;
+    err.style.display = 'block';
+    el.style.borderColor = '#ef535055';
+  }
+}
+
+async function submitForm() {
+  const data = getFormData();
+  if (Object.keys(data).length === 0) return showResult(false, 'Tambah minimal satu field dulu.');
+  await doSave(data);
+}
+
+async function submitJson() {
+  let data;
+  try {
+    data = JSON.parse(document.getElementById('jsonInput').value);
+  } catch (e) {
+    return showResult(false, 'JSON tidak valid: ' + e.message);
+  }
+  delete data._sheet;
+  await doSave(data);
+}
+
+async function doSave(data) {
+  const sheet = document.getElementById('sheetName').value.trim() || 'scripts';
+  showResult(null, '<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+  try {
+    const res = await fetch('/script/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ _sheet: sheet, ...data })
+    });
+    const json = await res.json();
+    if (json.success) {
+      showResult(true, `Berhasil disimpan ke sheet <strong>"${json.sheet}"</strong>!<br><small style="color:#888">ID: ${json.data.id}</small>`);
+    } else {
+      showResult(false, json.message);
+    }
+  } catch (e) {
+    showResult(false, e.message);
+  }
+}
+
+function showResult(success, msg) {
+  const box = document.getElementById('resultBox');
+  box.style.display = 'block';
+  if (success === null) {
+    box.style.background = '#1e1e2e';
+    box.style.border = '1px solid #333';
+    box.style.color = '#aaa';
+  } else if (success) {
+    box.style.background = '#00c87322';
+    box.style.border = '1px solid #00c87355';
+    box.style.color = '#00c873';
+  } else {
+    box.style.background = '#ff4d4d22';
+    box.style.border = '1px solid #ff4d4d55';
+    box.style.color = '#ff6b6b';
+  }
+  box.innerHTML = msg;
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function loadExistingSheets() {
+  const listEl = document.getElementById('existingSheetsList');
+  listEl.style.display = 'flex';
+  listEl.innerHTML = '<span style="color:#888;font-size:12px;">Memuat...</span>';
+  try {
+    const res = await fetch('/script/sheets');
+    const json = await res.json();
+    if (json.success) {
+      const reserved = ['users','data','chat','api_logs','vydb','Sheet1'];
+      listEl.innerHTML = json.sheets
+        .filter(s => !reserved.includes(s))
+        .map(s => `<button type="button" onclick="document.getElementById('sheetName').value='${s}'"
+          style="background:#1e1e2e;border:1px solid #5c6bc055;color:#7986cb;border-radius:20px;padding:4px 14px;cursor:pointer;font-size:12px;">${s}</button>`)
+        .join('') || '<span style="color:#666;font-size:12px;">Belum ada sheet custom.</span>';
+    }
+  } catch (e) {
+    listEl.innerHTML = '<span style="color:#ef5350;font-size:12px;">Gagal load.</span>';
+  }
+}
+
+// Init: default fields for scripts
+addField('nama', '', 'text');
+addField('judul', '', 'text');
+addField('kode', '', 'textarea');
+updatePreview();
+</script>

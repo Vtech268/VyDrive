@@ -36,7 +36,7 @@ try {
 }
 
 // Default sheets yang harus ada
-const DEFAULT_SHEETS = ['users', 'data', 'chat', 'api_logs', 'vydb'];
+const DEFAULT_SHEETS = ['users', 'data', 'chat', 'api_logs', 'vydb', 'scripts'];
 
 /**
  * Inisialisasi Google Sheets - auto create sheets jika belum ada
@@ -142,7 +142,8 @@ async function initializeSheetHeaders(sheetName) {
     data: ['id', 'db_name', 'api_key', 'data_json', 'created_at', 'updated_at'],
     chat: ['id', 'sender', 'sender_type', 'message', 'user_id', 'is_read', 'created_at'],
     api_logs: ['id', 'endpoint', 'method', 'user_id', 'api_key', 'ip', 'status', 'response_time', 'created_at'],
-    vydb: ['id', 'user_id', 'db_name', 'api_key', 'sheet_id', 'request_count', 'created_at']
+    vydb: ['id', 'user_id', 'db_name', 'api_key', 'sheet_id', 'request_count', 'created_at'],
+    scripts: ['id', 'nama', 'judul', 'nama_file', 'ekstensi', 'kategori', 'deskripsi', 'tags', 'kode', 'created_at']
   };
 
   if (headers[sheetName]) {
@@ -400,6 +401,101 @@ function generateApiKey() {
   return 'vydb_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
+/**
+ * Get list of existing sheet tab names in the spreadsheet
+ */
+async function getExistingSheetNames() {
+  try {
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: config.GOOGLE_SHEET_ID });
+    return spreadsheet.data.sheets.map(s => s.properties.title);
+  } catch (err) {
+    console.error('❌ Error getting sheet names:', err.message);
+    return [];
+  }
+}
+
+/**
+ * Ensure a sheet exists with the given headers.
+ * - If the sheet doesn't exist: create it and write headers as row 1.
+ * - If the sheet exists but is missing columns: append missing columns to row 1.
+ */
+async function ensureSheetWithHeaders(sheetName, headers) {
+  const existing = await getExistingSheetNames();
+
+  if (!existing.includes(sheetName)) {
+    await createSheet(sheetName);
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: config.GOOGLE_SHEET_ID,
+      range: `${sheetName}!A1`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [headers] }
+    });
+    console.log(`✅ Auto-created sheet "${sheetName}" with headers: ${headers.join(', ')}`);
+    return headers;
+  }
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: config.GOOGLE_SHEET_ID,
+    range: `${sheetName}!1:1`
+  });
+  const currentHeaders = (res.data.values && res.data.values[0]) || [];
+
+  const missing = headers.filter(h => !currentHeaders.includes(h));
+  if (missing.length > 0) {
+    const updated = [...currentHeaders, ...missing];
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: config.GOOGLE_SHEET_ID,
+      range: `${sheetName}!A1`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [updated] }
+    });
+    console.log(`✅ Added missing columns to "${sheetName}": ${missing.join(', ')}`);
+    return updated;
+  }
+
+  return currentHeaders;
+}
+
+/**
+ * Dynamic save — user sends any JSON, system auto-creates the sheet + columns.
+ * Reserved keys stripped from payload: _sheet, _id, _created_at
+ *
+ * @param {string} sheetName - name of the sheet tab
+ * @param {object} dataObj   - key-value pairs of user data
+ * @returns {object}         - saved record including auto-added id and created_at
+ */
+async function dynamicSave(sheetName, dataObj) {
+  if (!sheetsAvailable || !sheets) throw new Error('Google Sheets tidak tersedia.');
+
+  const safeSheet = sheetName.replace(/[^a-zA-Z0-9_\- ]/g, '').trim().slice(0, 50);
+  if (!safeSheet) throw new Error('Nama sheet tidak valid.');
+
+  const id = Date.now().toString();
+  const created_at = new Date().toISOString();
+  const record = { id, ...dataObj, created_at };
+
+  const headers = Object.keys(record);
+  const finalHeaders = await ensureSheetWithHeaders(safeSheet, headers);
+
+  const row = finalHeaders.map(h => {
+    const v = record[h];
+    if (v === undefined || v === null) return '';
+    if (typeof v === 'object') return JSON.stringify(v);
+    return String(v);
+  });
+
+  await appendToSheet(safeSheet, row);
+  return record;
+}
+
+/**
+ * Dynamic read — get all rows from any sheet as array of objects
+ */
+async function dynamicRead(sheetName) {
+  if (!sheetsAvailable) throw new Error('Google Sheets tidak tersedia.');
+  return await getSheetData(sheetName);
+}
+
 module.exports = {
   initGoogleSheets,
   isSheetsAvailable,
@@ -417,5 +513,8 @@ module.exports = {
   markMessagesAsRead,
   addApiLog,
   getApiLogs,
+  dynamicSave,
+  dynamicRead,
+  getExistingSheetNames,
   sheets
 };

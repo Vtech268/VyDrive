@@ -52,6 +52,22 @@
             </div>
 
             <div class="docs-nav-group">
+              <span class="docs-nav-label">Sheet API (Multi-Format)</span>
+              <a href="#sheet-intro" class="docs-nav-link" data-section="sheet-intro">
+                <i class="fas fa-table"></i> Pengenalan Sheet API
+              </a>
+              <a href="#sheet-save" class="docs-nav-link" data-section="sheet-save">
+                <span class="nav-method-badge nav-post">POST</span> /script/upload
+              </a>
+              <a href="#sheet-read" class="docs-nav-link" data-section="sheet-read">
+                <span class="nav-method-badge nav-get">GET</span> /script/data/:sheet
+              </a>
+              <a href="#sheet-list" class="docs-nav-link" data-section="sheet-list">
+                <span class="nav-method-badge nav-get">GET</span> /script/sheets
+              </a>
+            </div>
+
+            <div class="docs-nav-group">
               <span class="docs-nav-label">Referensi</span>
               <a href="#examples" class="docs-nav-link" data-section="examples">
                 <i class="fas fa-code"></i> Contoh Kode
@@ -598,6 +614,222 @@ curl -X DELETE '<%= baseUrl %>/api/delete' \
             <div>
               <strong>Format error response:</strong>
               <code class="inline-code">{"success": false, "message": "Error description here"}</code>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SHEET API ===== -->
+        <section id="sheet-intro" class="docs-section">
+          <div class="docs-section-tag">07</div>
+          <h2 class="docs-section-title">Sheet API — Multi-Format</h2>
+          <p class="docs-section-desc">
+            Sheet API memungkinkan kamu menyimpan data dalam format apapun ke Google Sheets <strong>tanpa setup manual</strong>.
+            Kirim JSON dengan field bebas + nama sheet, sistem otomatis membuat tab sheet baru beserta kolomnya.
+            Tidak perlu mendefinisikan skema terlebih dahulu.
+          </p>
+
+          <div class="docs-info-grid">
+            <div class="docs-info-card">
+              <div class="docs-info-icon"><i class="fas fa-magic"></i></div>
+              <h4>Auto-Create Sheet</h4>
+              <p>Sheet tab dibuat otomatis jika belum ada. Kolom mengikuti field yang kamu kirim.</p>
+            </div>
+            <div class="docs-info-card">
+              <div class="docs-info-icon"><i class="fas fa-layer-group"></i></div>
+              <h4>Multi-Format</h4>
+              <p>Setiap sheet bisa punya struktur berbeda. Satu spreadsheet, banyak format data.</p>
+            </div>
+            <div class="docs-info-card">
+              <div class="docs-info-icon"><i class="fas fa-plus-circle"></i></div>
+              <h4>Kolom Dinamis</h4>
+              <p>Kirim field baru kapanpun, kolom baru otomatis ditambahkan ke sheet yang ada.</p>
+            </div>
+          </div>
+
+          <div class="docs-callout docs-callout-info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+              <strong>Tidak perlu API Key.</strong> Sheet API dapat diakses tanpa autentikasi.
+              Bisa juga digunakan langsung dari form di <a href="/script/upload">halaman Sheet</a>.
+            </div>
+          </div>
+        </section>
+
+        <!-- Sheet: POST /script/upload -->
+        <section id="sheet-save" class="docs-section">
+          <div class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-post">POST</span>
+                <code class="endpoint-path">/script/upload</code>
+              </div>
+              <p class="endpoint-desc">Simpan data ke sheet manapun. Sheet + kolom otomatis dibuat jika belum ada.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">Request Body</h5>
+              <p style="color:var(--text-muted);font-size:13px;margin-bottom:8px;">Field <code class="inline-code">_sheet</code> menentukan nama tab sheet. Semua field lainnya bebas — tidak ada skema tetap.</p>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON — Contoh 1: Data Produk</span>
+                  <button class="copy-btn" data-copy='{"_sheet":"produk","nama":"Kaos Hitam","harga":"75000","stok":"50"}'>
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+                <pre class="code-block"><code>{
+  "_sheet": "produk",
+  "nama": "Kaos Hitam",
+  "harga": "75000",
+  "stok": "50",
+  "kategori": "fashion"
+}</code></pre>
+              </div>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON — Contoh 2: Laporan Bug</span>
+                </div>
+                <pre class="code-block"><code>{
+  "_sheet": "laporan_bug",
+  "judul": "Login gagal di mobile",
+  "severity": "high",
+  "status": "open",
+  "pelapor": "user123"
+}</code></pre>
+              </div>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON — Contoh 3: Upload Kode/Script</span>
+                </div>
+                <pre class="code-block"><code>{
+  "_sheet": "scripts",
+  "nama": "Caliph",
+  "judul": "ShortUrl Class",
+  "nama_file": "shorturl.js",
+  "kategori": "tool",
+  "kode": "class ShortUrl { ... }"
+}</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "sheet": "produk",
+  "data": {
+    "id": "1773622712961",
+    "nama": "Kaos Hitam",
+    "harga": "75000",
+    "stok": "50",
+    "kategori": "fashion",
+    "created_at": "2026-03-16T00:58:32.961Z"
+  }
+}</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Contoh — JavaScript fetch</h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fab fa-js"></i> JavaScript</span>
+                </div>
+                <pre class="code-block"><code>// Format bebas — field apapun, sheet apapun
+const res = await fetch('/script/upload', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    _sheet: 'data_saya',     // nama tab di Google Sheets
+    nama: 'Caliph',
+    nilai: 95,
+    catatan: 'mantap',
+    // ... field bebas lainnya
+  })
+});
+const json = await res.json();
+console.log(json.data.id); // ID auto-generated</code></pre>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- Sheet: GET /script/data/:sheet -->
+        <section id="sheet-read" class="docs-section">
+          <div class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-get">GET</span>
+                <code class="endpoint-path">/script/data/:sheet</code>
+              </div>
+              <p class="endpoint-desc">Ambil semua data dari sheet tertentu sebagai array of objects.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">URL Parameter</h5>
+              <div class="params-table-wrapper">
+                <table class="params-table">
+                  <thead><tr><th>Parameter</th><th>Tipe</th><th>Deskripsi</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>sheet</code></td><td>string</td><td>Nama sheet tab yang ingin dibaca</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h5 class="endpoint-sub">Contoh Request</h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-terminal"></i> HTTP</span>
+                </div>
+                <pre class="code-block"><code>GET /script/data/produk</code></pre>
+              </div>
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "sheet": "produk",
+  "total": 2,
+  "data": [
+    { "id": "1773...", "nama": "Kaos Hitam", "harga": "75000", "created_at": "..." },
+    { "id": "1773...", "nama": "Celana Jeans", "harga": "150000", "created_at": "..." }
+  ]
+}</code></pre>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- Sheet: GET /script/sheets -->
+        <section id="sheet-list" class="docs-section">
+          <div class="endpoint-card">
+            <div class="endpoint-card-header">
+              <div class="endpoint-title-row">
+                <span class="method method-get">GET</span>
+                <code class="endpoint-path">/script/sheets</code>
+              </div>
+              <p class="endpoint-desc">Tampilkan daftar semua sheet tab yang tersedia di spreadsheet.</p>
+            </div>
+            <div class="endpoint-card-body">
+
+              <h5 class="endpoint-sub">Response <span class="status-badge status-200">200 OK</span></h5>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang"><i class="fas fa-code"></i> JSON</span>
+                </div>
+                <pre class="code-block"><code>{
+  "success": true,
+  "total": 7,
+  "sheets": ["users", "scripts", "produk", "laporan_bug", "data_saya", "..."]
+}</code></pre>
+              </div>
+
             </div>
           </div>
         </section>
