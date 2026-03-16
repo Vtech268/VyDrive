@@ -194,22 +194,21 @@ async function initServices() {
     console.log('⚡ App running without MongoDB - some features may be unavailable');
   }
 
-  initGoogleSheets().then(ok => {
-    if (ok) {
-      console.log('✅ Google Sheets ready');
-    } else {
-      console.log('⚠️ Google Sheets unavailable - using MongoDB as fallback data store');
-    }
-  }).catch(err => {
+  initGoogleSheets().catch(err => {
     console.error('❌ Google Sheets init error:', err.message);
   });
 }
 
-initServices().then(() => {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 VyDrive Cloud v${config.app.version} running on port ${PORT}`);
-    console.log(`📁 Static files served from: ${path.join(__dirname, 'public')}`);
+// Di Vercel (serverless), skip app.listen() — app di-export sebagai handler
+if (process.env.VERCEL) {
+  initServices();
+} else {
+  initServices().then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 VyDrive Cloud v${config.app.version} running on port ${PORT}`);
+      console.log(`📁 Static files served from: ${path.join(__dirname, 'public')}`);
+    });
   });
-});
+}
 
 module.exports = app;

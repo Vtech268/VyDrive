@@ -6,6 +6,17 @@ let initAttempts = 0;
 const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 5000;
 
+// Errors that are permanent/fatal — retrying won't help
+const FATAL_ERROR_PATTERNS = [
+  'invalid_grant',
+  'invalid_client',
+  'unauthorized_client',
+  'Invalid JWT Signature',
+  'invalid_jwt',
+  'INVALID_ARGUMENT',
+  'The caller does not have permission'
+];
+
 // Setup Google Auth
 let auth, sheets;
 try {
@@ -64,17 +75,27 @@ async function initGoogleSheets() {
     return true;
   } catch (error) {
     sheetsAvailable = false;
-    console.error('❌ Google Sheets initialization error:', error.message);
+    const errMsg = error.message || '';
 
-    if (error.message && error.message.includes('has not been used') || error.message.includes('disabled')) {
+    const isFatal = FATAL_ERROR_PATTERNS.some(p => errMsg.includes(p));
+
+    if (isFatal) {
+      console.warn('⚠️ Google Sheets credentials invalid — using MongoDB as fallback. (Update GOOGLE_PRIVATE_KEY/GOOGLE_CLIENT_EMAIL to re-enable)');
+      return false;
+    }
+
+    console.error('❌ Google Sheets initialization error:', errMsg);
+
+    if (errMsg.includes('has not been used') || errMsg.includes('disabled')) {
       console.error('💡 Fix: Enable Google Sheets API at https://console.developers.google.com/apis/api/sheets.googleapis.com/overview?project=' + config.GOOGLE_PROJECT_ID);
-      console.log('⚡ App will continue using MongoDB as fallback storage');
     }
 
     if (initAttempts < MAX_RETRY_ATTEMPTS) {
       initAttempts++;
       console.log(`🔄 Retrying Sheets init in ${RETRY_DELAY_MS / 1000}s... (attempt ${initAttempts}/${MAX_RETRY_ATTEMPTS})`);
       setTimeout(() => initGoogleSheets(), RETRY_DELAY_MS * initAttempts);
+    } else {
+      console.log('⚡ All retry attempts exhausted — using MongoDB as fallback storage.');
     }
 
     return false;
